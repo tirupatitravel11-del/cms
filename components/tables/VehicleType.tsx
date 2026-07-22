@@ -32,8 +32,8 @@ interface VehicleType {
   description: string;
   isActive: boolean;
   isDeleted: boolean;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const VehicleType = () => {
@@ -476,8 +476,8 @@ const VehicleType = () => {
           
                     {[
                     
-                      item.created_at,
-                      item.updated_at,
+                      item.createdAt,
+                      item.updatedAt,
                     ].map((date, i) => (
                       <td key={i} className="px-4 py-4 text-center">
                         <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">

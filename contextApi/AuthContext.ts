@@ -1,5 +1,5 @@
 "use client";
-import { AuthRoutes } from "@/route_config/config";
+// import { AuthRoutes } from "@/route_config/config";
 import createDataContext from "./CreateDataContext";
 
 import axios from "axios";
