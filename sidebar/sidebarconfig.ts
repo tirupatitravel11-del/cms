@@ -11,7 +11,8 @@ import {
   LockKeyhole,
   Network,
   Image,
-  Car
+  Car,
+  Building2
 } from "lucide-react";
 
 export interface SidebarItemType {
@@ -42,6 +43,9 @@ export const sidebarConfig: SidebarItemType[] = [
   { label: "Change Password", path: "/changepassword", permission: "change_password", icon: LockOutlined, },
   { label: "Vehicle Type", path: "/vehicletype", permission: "", icon: Car, },
   { label: "Profile", path: "/profile", permission: "profile", icon: PersonOutlined, role: ["admin","counselor", "teacher", "student"] },
+    { label: "Cities", path: "/city", permission: "", icon: Building2,  },
+     { label: "States", path: "/state", permission: "", icon: Building2,  },
+
 
 
   {
