@@ -33,8 +33,8 @@ interface StateType {
   isActive: boolean;
   isDeleted: boolean;
   code: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 const StateTable = () => {
@@ -87,8 +87,8 @@ const StateTable = () => {
       );
 
       setData(res?.data?.data);
-      console.log(res?.data?.data);
-      setDataCount(res?.data?.count);
+      console.log(res?.data);
+      setDataCount(res?.data?.pagination?.total);
     } catch {
       toast.error("Error fetching State Type");
     } finally {
@@ -116,7 +116,8 @@ const StateTable = () => {
       );
 
       // backend ke response ke hisaab se data nikalna
-      const addedOrUpdated = res?.data?.newState || res?.data?.result;
+      const addedOrUpdated = res?.data.data || res?.data.data;
+      console.log(addedOrUpdated, "abc");
       setAddModal(false);
       setEditModal(false);
       clearData();
@@ -145,6 +146,25 @@ const StateTable = () => {
       // if (!formData.id) {
       //   setDataCount((prevCount) => prevCount + 1);
       // }
+      setData((prev) => {
+        if (formData.id) {
+          // EDIT
+          return prev.map((item) =>
+            item?._id === addedOrUpdated?._id ? addedOrUpdated : item,
+          );
+        }
+
+        // ADD
+        const updatedList = [addedOrUpdated, ...prev];
+
+        // Keep pagination limit
+        return updatedList.slice(0, rowsPerPage);
+      });
+
+      // Increase total count only for new item
+      if (!formData.id) {
+        setDataCount((prevCount) => prevCount + 1);
+      }
 
       toast.success(res?.data?.message);
     } catch (error: any) {
@@ -189,7 +209,7 @@ const StateTable = () => {
   const handleRestore = async (id: string) => {
     try {
       let res = await axios.post(
-        process.env.apiUrl + "/api/restore-vehicle-type",
+        process.env.apiUrl + "/api/restore-state",
         { id },
         { withCredentials: true },
       );
@@ -204,14 +224,14 @@ const StateTable = () => {
       );
 
       setMessage(res?.data?.message);
-      toast.success(res?.data?.message || "Vehicle Type restored successfully");
+      toast.success(res?.data?.message || "State restored successfully");
     } catch (error: any) {
       if (error?.response?.data?.error) {
         setError(error?.response?.data?.error);
         toast.error(error?.response?.data?.error);
       } else {
-        setError("Error while restoring Vehicle Type.");
-        toast.error("Error while restoring Vehicle Type.");
+        setError("Error while restoring State.");
+        toast.error("Error while restoring State.");
       }
     }
   };
@@ -299,7 +319,7 @@ const StateTable = () => {
             <tr className="align-top">
               <th className="px-4 py-2">#</th>
               <th className="px-4 py-2">Action</th>
-              {/* <th className="px-4 py-2">Status</th> */}
+              <th className="px-4 py-2">Status</th>
               {/* <th className="px-4 py-2">Visibility</th> */}
 
               {[
@@ -375,31 +395,34 @@ const StateTable = () => {
                           className="absolute left-10 top-9 border border-gray-100 w-32 bg-white rounded shadow-lg"
                           style={{ zIndex: 100 }}
                         >
-                          {/* {item.isDeleted === false ? ( */}
-                          <>
-                            <div
-                              onClick={() => {
-                                setEditData(item);
-                                setOption(undefined);
-                              }}
-                              className="hover:bg-gray-100 flex items-center px-4 py-2 cursor-pointer"
-                            >
-                              <Edit fontSize="small" htmlColor="orange" />
-                              <span className="ml-2">Edit</span>
-                            </div>
+                          {item.isDeleted === false ? (
+                            <>
+                              <div
+                                onClick={() => {
+                                  setEditData(item);
+                                  setOption(undefined);
+                                }}
+                                className="hover:bg-gray-100 flex items-center px-4 py-2 cursor-pointer"
+                              >
+                                <Edit fontSize="small" htmlColor="orange" />
+                                <span className="ml-2">Edit</span>
+                              </div>
 
-                            <div
-                              onClick={() => {
-                                handleDelete(item._id);
-                                setOption(undefined);
-                              }}
-                              className="hover:bg-gray-100 flex items-center px-4 py-2 cursor-pointer"
-                            >
-                              <Cancel fontSize="small" sx={{ color: "red" }} />
-                              <span className="ml-2">Delete</span>
-                            </div>
-                          </>
-                          {/* ) : (
+                              <div
+                                onClick={() => {
+                                  handleDelete(item._id);
+                                  setOption(undefined);
+                                }}
+                                className="hover:bg-gray-100 flex items-center px-4 py-2 cursor-pointer"
+                              >
+                                <Cancel
+                                  fontSize="small"
+                                  sx={{ color: "red" }}
+                                />
+                                <span className="ml-2">Delete</span>
+                              </div>
+                            </>
+                          ) : (
                             <>
                               <div
                                 onClick={() => {
@@ -413,9 +436,9 @@ const StateTable = () => {
                                   sx={{ color: "green" }}
                                 />
                                 <span className="ml-2">Restore</span>
-                              </div> */}
+                              </div>
 
-                          {/* <div
+                              <div
                                 onClick={() => {
                                   setEditData(item);
                                   setOption(undefined);
@@ -426,14 +449,14 @@ const StateTable = () => {
                                 <span className="ml-2">Edit</span>
                               </div>
                             </>
-                          )} */}
+                          )}
                         </div>
                       </ClickAwayListener>
                     )}
                   </td>
 
                   {/* STATUS */}
-                  {/* <td className="px-4 py-4 text-center">
+                  <td className="px-4 py-4 text-center">
                     <span
                       className={`text-xs font-medium px-2.5 py-0.5 rounded ${
                         item.isDeleted === false
@@ -443,7 +466,7 @@ const StateTable = () => {
                     >
                       {item.isDeleted === false ? "Active" : "Deleted"}
                     </span>
-                  </td> */}
+                  </td>
 
                   {/* VISIBILITY */}
                   {/* <td className="px-4 py-4 text-center">
@@ -476,10 +499,12 @@ const StateTable = () => {
                   <td className="px-4 py-4 text-center">{item.code}</td>
 
                   <td className="px-4 py-4 text-center">{item.description}</td>
-                  {[item.createdAt, item.updatedAt].map((date, i) => (
+                  {[item.created_at, item.updated_at].map((date, i) => (
                     <td key={i} className="px-4 py-4 text-center">
                       <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {DateTime.fromISO(date).toFormat("LLL dd, yyyy")}
+                        {DateTime.fromISO(date).toFormat(
+                          "LLL dd, yyyy  , hh:mm",
+                        )}
                       </span>
                     </td>
                   ))}

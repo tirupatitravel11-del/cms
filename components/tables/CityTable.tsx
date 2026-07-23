@@ -26,20 +26,24 @@ import { DateTime } from "luxon";
 import toast from "react-hot-toast";
 import { X } from "lucide-react";
 
-interface VehicleType {
+interface CityType {
   _id: string;
-  typeName: string;
+  name: string;
+  state_id: string;
   description: string;
+  isPopular: boolean;
+  sortedOrder: number;
   isActive: boolean;
   isDeleted: boolean;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 const CityTable = () => {
   const router = useRouter();
 
-  const [data, setData] = useState<VehicleType[]>([]);
+  const [data, setData] = useState<CityType[]>([]);
+  const [statelist, setStatelist] = useState<any[]>([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [newPage, setNewPage] = useState(1);
   const [dataCount, setDataCount] = useState(0);
@@ -60,12 +64,15 @@ const CityTable = () => {
 
   const [formData, setFormData] = useState({
     id: "",
-    typeName: "",
+    name: "",
+    isPopular: false,
     description: "",
+    state_id: "",
   });
   // const today = DateTime.now().toFormat("yyyy-MM-dd");
   const handleInput = (e: any) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    console.log(formData);
   };
 
   // ✅ GET DATA
@@ -74,7 +81,7 @@ const CityTable = () => {
       setLoading(true);
 
       const res = await axios.post(
-        process.env.apiUrl + "/api/get-all-vehicle-type",
+        process.env.apiUrl + "/api/all-city",
         {
           limit: rowsPerPage,
           page: newPage,
@@ -85,35 +92,60 @@ const CityTable = () => {
       );
 
       setData(res?.data?.data);
-      setDataCount(res?.data?.count);
+      console.log(res?.data?.data);
+      setDataCount(res?.data?.pagination?.total);
     } catch {
-      toast.error("Error fetching Vehicle Type");
+      toast.error("Error fetching City Type");
     } finally {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    handleGetStateList();
+  }, []);
   useEffect(() => {
     getData();
   }, [newPage, rowsPerPage, searchQuery, order]);
 
+  const handleGetStateList = async () => {
+    try {
+      let res = await axios.post(
+        process.env.apiUrl + "/api/dropdown-state",
+
+        { withCredentials: true },
+      );
+
+      // UI state update
+      setStatelist(res?.data?.data);
+    } catch (error: any) {
+      if (error?.response?.data?.error) {
+        setError(error?.response?.data?.error);
+        toast.error(error?.response?.data?.error);
+      } else {
+        setError("Error.");
+        toast.error("Error.");
+      }
+    }
+  };
   // ✅ CREATE / UPDATE
   const handleSave = async () => {
-    if (!formData.typeName) {
+    if (!formData.name) {
       toast.error("Name required");
       return;
     }
 
     try {
       setLoading(true);
+      console.log(formData);
+
       let res = await axios.post(
-        process.env.apiUrl + "/api/create-vehicle-type",
+        process.env.apiUrl + "/api/create-update-city",
         formData,
         { withCredentials: true },
       );
 
       // backend ke response ke hisaab se data nikalna
-      const addedOrUpdated = res?.data?.vehicleType || res?.data?.result;
+      const addedOrUpdated = res?.data?.data || res?.data?.result;
       setAddModal(false);
       setEditModal(false);
       clearData();
@@ -148,7 +180,7 @@ const CityTable = () => {
       if (error?.response?.data?.error) {
         toast.error(error?.response?.data?.error);
       } else {
-        toast.error("Error in saving Vehicle Type");
+        toast.error("Error in saving City");
       }
     } finally {
       setLoading(false);
@@ -158,7 +190,7 @@ const CityTable = () => {
   const handleDelete = async (id: string) => {
     try {
       let res = await axios.post(
-        process.env.apiUrl + "/api/delete-vehicle-type",
+        process.env.apiUrl + "/api/delete-city",
         { id },
         { withCredentials: true },
       );
@@ -171,14 +203,14 @@ const CityTable = () => {
       );
 
       setMessage(res?.data?.message);
-      toast.success(res?.data?.message || "Vehicle Type deleted successfully");
+      toast.success(res?.data?.message || "City deleted successfully");
     } catch (error: any) {
       if (error?.response?.data?.error) {
         setError(error?.response?.data?.error);
         toast.error(error?.response?.data?.error);
       } else {
-        setError("Error while deleting Vehicle Type.");
-        toast.error("Error while deleting Vehicle Type.");
+        setError("Error while deleting City.");
+        toast.error("Error while deleting City.");
       }
     }
   };
@@ -186,7 +218,7 @@ const CityTable = () => {
   const handleRestore = async (id: string) => {
     try {
       let res = await axios.post(
-        process.env.apiUrl + "/api/restore-vehicle-type",
+        process.env.apiUrl + "/api/restore-city",
         { id },
         { withCredentials: true },
       );
@@ -201,14 +233,14 @@ const CityTable = () => {
       );
 
       setMessage(res?.data?.message);
-      toast.success(res?.data?.message || "Vehicle Type restored successfully");
+      toast.success(res?.data?.message || "City restored successfully");
     } catch (error: any) {
       if (error?.response?.data?.error) {
         setError(error?.response?.data?.error);
         toast.error(error?.response?.data?.error);
       } else {
-        setError("Error while restoring Vehicle Type.");
-        toast.error("Error while restoring Vehicle Type.");
+        setError("Error while restoring City.");
+        toast.error("Error while restoring City.");
       }
     }
   };
@@ -234,11 +266,13 @@ const CityTable = () => {
   //   }
   // };
 
-  const setEditData = (item: VehicleType) => {
+  const setEditData = (item: CityType) => {
     setFormData({
       id: item._id,
-      typeName: item.typeName,
+      name: item.name,
       description: item.description,
+      isPopular: item.isPopular,
+      state_id: item.state_id,
     });
     setEditModal(true);
   };
@@ -246,8 +280,10 @@ const CityTable = () => {
   const clearData = () => {
     setFormData({
       id: "",
-      typeName: "",
+      name: "",
       description: "",
+      isPopular: false,
+      state_id: "",
     });
   };
   return (
@@ -282,7 +318,7 @@ const CityTable = () => {
             onClick={() => setAddModal(true)}
             className="bg-blue-400 text-white px-4 py-1 rounded-md cursor-pointer"
           >
-            Add Vehicle Type
+            Add City
           </div>
         </div>
       </div>
@@ -297,11 +333,16 @@ const CityTable = () => {
               <th className="px-4 py-2">Status</th>
               {/* <th className="px-4 py-2">Visibility</th> */}
 
-              {[
-                { col: "typeName", label: "Name" },
+              {/* <th className="px-4 py-2">Popular</th>
+              <th className="px-4 py-2">Description</th> */}
 
-                { col: "created_at", label: "Created" },
-                { col: "updated_at", label: "Updated" },
+              {[
+                { col: "name", label: "Name" },
+                { col: "description", label: "Description" },
+                { col: "popular", label: "Popular" },
+
+                { col: "createdAt", label: "Created" },
+                { col: "updatedAt", label: "Updated" },
               ].map((item) => (
                 <th
                   key={item.col}
@@ -467,13 +508,27 @@ const CityTable = () => {
                       </div>
                     </td> */}
 
-                  {/* <td className="px-4 py-4 text-center">{item.badge}</td> */}
-                  <td className="px-4 py-4 text-center">{item.typeName}</td>
+                  <td className="px-4 py-4 text-center">{item.name}</td>
 
-                  {[item.createdAt, item.updatedAt].map((date, i) => (
+                  <td className="px-4 py-4 text-center">{item.description}</td>
+                  <td className="px-4 py-4 text-center">
+                    <span
+                      className={`text-xs font-medium px-2.5 py-0.5 rounded ${
+                        item.isPopular === false
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-yellow-100 text-yellow-800"
+                      }`}
+                    >
+                      {item.isPopular === false ? "Rare" : "Popular"}
+                    </span>
+                  </td>
+
+                  {[item.created_at, item.updated_at].map((date, i) => (
                     <td key={i} className="px-4 py-4 text-center">
                       <span className="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {DateTime.fromISO(date).toFormat("LLL dd, yyyy")}
+                        {DateTime.fromISO(date).toFormat(
+                          "LLL dd, yyyy  , hh:mm",
+                        )}
                       </span>
                     </td>
                   ))}
@@ -539,8 +594,22 @@ const CityTable = () => {
             </button>
 
             <h2 className="text-xl font-bold">
-              {editModal ? "Edit Vehicle Type" : "Add Vehicle Type"}
+              {editModal ? "Edit City" : "Add City"}
             </h2>
+            {/* State Dropdown */}
+            <select
+              name="state_id"
+              value={formData.state_id}
+              onChange={handleInput}
+              className="border w-full p-2 rounded bg-white"
+            >
+              <option value="">Select State</option>
+              {statelist.map((state) => (
+                <option key={state._id} value={state._id}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
 
             {/* <input
               name="badge"
@@ -551,9 +620,9 @@ const CityTable = () => {
             /> */}
 
             <input
-              name="typeName"
+              name="name"
               placeholder="Name"
-              value={formData.typeName}
+              value={formData.name}
               onChange={handleInput}
               className="border w-full p-2 rounded"
             />
@@ -565,7 +634,29 @@ const CityTable = () => {
               onChange={handleInput}
               className="border w-full p-2 rounded"
             />
+            {/* Popular Toggle */}
+            <div className="flex items-center justify-between border rounded p-3">
+              <span className="font-medium">Popular City</span>
 
+              <button
+                type="button"
+                onClick={() =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    isPopular: !prev.isPopular,
+                  }))
+                }
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                  formData.isPopular ? "bg-blue-500" : "bg-gray-300"
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                    formData.isPopular ? "translate-x-6" : "translate-x-1"
+                  }`}
+                />
+              </button>
+            </div>
             <button
               onClick={handleSave}
               className="bg-blue-500 text-white px-4 py-2 rounded w-full"
