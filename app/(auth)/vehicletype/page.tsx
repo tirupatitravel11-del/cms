@@ -1,11 +1,12 @@
 "use client";
 import RoleTable from "@/components/tables/RoleTable";
-import VehicleType from "@/components/tables/VehicleType";
+import VehicleType from "@/components/tables/CabTypeTable";
 import { Context } from "@/contextApi/AuthContext";
 import { contextType } from "@/contextApi/CreateDataContext";
 import { Car, Megaphone, User, Users } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useContext, useEffect } from "react";
+import CabTypeTable from "@/components/tables/CabTypeTable";
 
 const page = () => {
   const { state, boundActions } = useContext<contextType>(Context);
@@ -26,11 +27,11 @@ const page = () => {
           <Car className="w-5 h-5 text-white" />
         </div>
         <h1 className="text-xl font-semibold text-gray-900 m-0 p-0">
-          Vehicle Type
+          Vehicle Type 
         </h1>
       </div>
 
-      <VehicleType />
+      <CabTypeTable />
     </>
   );
 };

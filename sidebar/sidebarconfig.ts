@@ -28,6 +28,8 @@ import {
   Image,
   Car,
   Building2,
+  CarTaxiFront,
+  Road,
 } from "lucide-react";
 
 export interface SidebarItemType {
@@ -69,6 +71,8 @@ export const sidebarConfig: SidebarItemType[] = [
   },
   { label: "States", path: "/states", permission: "", icon: Building2 },
   { label: "Cities", path: "/city", permission: "", icon: Building2 },
+  { label: "Vehicle", path: "/vehicle", permission: "", icon: CarTaxiFront },
+  { label: "Route", path: "/route", permission: "", icon: Road },
 
   {
     label: "Role & Permission",
