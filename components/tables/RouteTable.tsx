@@ -26,14 +26,20 @@ import { DateTime } from "luxon";
 import toast from "react-hot-toast";
 import { X } from "lucide-react";
 
+interface DropdownItem {
+  _id: string;
+  name: string;
+  code?: string;
+}
+
 interface RouteType {
   _id: string;
 
-  from_state_id: string;
-  from_city_id: string;
+  from_state_id: DropdownItem;
+  from_city_id: DropdownItem;
 
-  to_state_id: string;
-  to_city_id: string;
+  to_state_id: DropdownItem;
+  to_city_id: DropdownItem;
 
   slug: string;
   distance: number | "";
@@ -48,12 +54,15 @@ interface RouteType {
   created_at: string;
   updated_at: string;
 }
+
 interface RouteTypeForm {
   id?: string;
+
   from_state_id: string;
   from_city_id: string;
   to_state_id: string;
   to_city_id: string;
+
   slug: string;
   distance: number | "";
   duration: string;
@@ -62,6 +71,42 @@ interface RouteTypeForm {
   isPopular: boolean;
   description: string;
 }
+// interface RouteType {
+//   _id: string;
+
+//   from_state_id: string;
+//   from_city_id: string;
+
+//   to_state_id: string;
+//   to_city_id: string;
+
+//   slug: string;
+//   distance: number | "";
+//   duration: string;
+//   image: string;
+//   tags: string[];
+//   isPopular: boolean;
+//   sortOrder: number;
+//   description: string;
+//   isActive: boolean;
+//   isDeleted: boolean;
+//   created_at: string;
+//   updated_at: string;
+// }
+// interface RouteTypeForm {
+//   id?: string;
+//   from_state_id: string;
+//   from_city_id: string;
+//   to_state_id: string;
+//   to_city_id: string;
+//   slug: string;
+//   distance: number | "";
+//   duration: string;
+//   image: string;
+//   tags: string[];
+//   isPopular: boolean;
+//   description: string;
+// }
 const Route = () => {
   const router = useRouter();
 
@@ -114,7 +159,7 @@ const Route = () => {
 
         { withCredentials: true },
       );
-
+      console.log(res?.data?.data, "sdf");
       // UI state update
       setStatelist(res?.data?.data);
     } catch (error: any) {
@@ -220,32 +265,59 @@ const Route = () => {
       );
 
       // backend ke response ke hisaab se data nikalna
-      const addedOrUpdated = res?.data?.data || res?.data?.result;
+      const addedOrUpdated: RouteType = res?.data?.data || res?.data?.result;
       setAddModal(false);
       setEditModal(false);
       clearData();
 
-      setData((prev) => {
+      setData((prev: RouteType[]) => {
         if (formData.id) {
-          // edit case
-          return prev.map((item) =>
-            item._id === addedOrUpdated._id ? addedOrUpdated : item,
-          );
-        } else {
-          // add case
-          let updatedList = [...prev];
-          if (updatedList.length >= rowsPerPage) {
-            updatedList = updatedList.filter(
-              (_, index) => index !== updatedList.length - 1,
-            );
-          }
-          if (addedOrUpdated) {
-            updatedList.unshift(addedOrUpdated);
-          }
-          return updatedList;
-        }
-      });
+          return prev.map((item) => {
+            if (item._id !== addedOrUpdated._id) {
+              return item;
+            }
 
+            const fromState = statelist.find(
+              (state) => state._id === addedOrUpdated.from_state_id,
+            );
+
+            const toState = statelist.find(
+              (state) => state._id === addedOrUpdated.to_state_id,
+            );
+
+            const fromCity = fromCityList.find(
+              (city) => city._id === addedOrUpdated.from_city_id,
+            );
+
+            const toCity = toCityList.find(
+              (city) => city._id === addedOrUpdated.to_city_id,
+            );
+
+            return {
+              ...item,
+              ...addedOrUpdated,
+
+              from_state_id: fromState || item.from_state_id,
+              from_city_id: fromCity || item.from_city_id,
+
+              to_state_id: toState || item.to_state_id,
+              to_city_id: toCity || item.to_city_id,
+            };
+          });
+        }
+
+        let updatedList = [...prev];
+
+        if (updatedList.length >= rowsPerPage) {
+          updatedList.pop();
+        }
+
+        if (addedOrUpdated) {
+          updatedList.unshift(addedOrUpdated);
+        }
+
+        return updatedList;
+      });
       if (!formData.id) {
         setDataCount((prevCount) => prevCount + 1);
       }
@@ -366,21 +438,49 @@ const Route = () => {
   //   }
   // };
 
-  const setEditData = (item: RouteTypeForm) => {
+  // const setEditData = (item: RouteTypeForm) => {
+  //   console.log(item);
+  //   setFormData({
+  //     id: item.id,
+  //     from_state_id: item.from_state_id,
+  //     from_city_id: item.from_city_id,
+  //     to_state_id: item.to_state_id,
+  //     to_city_id: item.to_city_id,
+  //     slug: item.slug,
+  //     distance: item.distance,
+  //     duration: item.duration,
+  //     image: item.image,
+  //     tags: item.tags,
+  //     isPopular: item.isPopular,
+  //     description: item.description,
+  //   });
+  //   setEditModal(true);
+  // };
+  const setEditData = (item: RouteType) => {
+    const fromStateId = item.from_state_id?._id || "";
+    const fromCityId = item.from_city_id?._id || "";
+
+    const toStateId = item.to_state_id?._id || "";
+    const toCityId = item.to_city_id?._id || "";
+
     setFormData({
-      id: item.id,
-      from_state_id: item.from_state_id,
-      from_city_id: item.from_city_id,
-      to_state_id: item.to_state_id,
-      to_city_id: item.to_city_id,
+      id: item._id,
+      from_state_id: fromStateId,
+      from_city_id: fromCityId,
+      to_state_id: toStateId,
+      to_city_id: toCityId,
       slug: item.slug,
       distance: item.distance,
       duration: item.duration,
       image: item.image,
-      tags: item.tags,
+      tags: item.tags || [],
       isPopular: item.isPopular,
       description: item.description,
     });
+
+    handleGetCityList(fromStateId, "from");
+    handleGetCityList(toStateId, "to");
+
     setEditModal(true);
   };
 
@@ -452,6 +552,10 @@ const Route = () => {
 
                 { col: "description", label: "Description" },
                 { col: "tags", label: "Tags" },
+                { col: "from_state", label: "From State" },
+                { col: "from_city", label: "From City" },
+                { col: "to_state", label: "To State" },
+                { col: "to_city", label: "To City" },
                 { col: "popular", label: "Popular" },
                 { col: "created_at", label: "Created" },
                 { col: "updated_at", label: "Updated" },
@@ -638,6 +742,18 @@ const Route = () => {
                         <span className="text-gray-400 text-sm">No tags</span>
                       )}
                     </div>
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    {item.from_state_id?.name}
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    {item.from_city_id?.name}
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    {item.to_state_id?.name}
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    {item.to_city_id?.name}
                   </td>
                   <td className="px-4 py-4 text-center">
                     <span
