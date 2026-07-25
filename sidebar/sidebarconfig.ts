@@ -30,6 +30,7 @@ import {
   Building2,
   CarTaxiFront,
   Road,
+  Banknote,
 } from "lucide-react";
 
 export interface SidebarItemType {
@@ -62,17 +63,18 @@ export const sidebarConfig: SidebarItemType[] = [
     icon: LockOutlined,
   },
   { label: "Vehicle Type", path: "/vehicletype", permission: "", icon: Car },
-  {
-    label: "Profile",
-    path: "/profile",
-    permission: "profile",
-    icon: PersonOutlined,
-    role: ["admin", "counselor", "teacher", "student"],
-  },
+  // {
+  //   label: "Profile",
+  //   path: "/profile",
+  //   permission: "profile",
+  //   icon: PersonOutlined,
+  //   role: ["admin", "counselor", "teacher", "student"],
+  // },
   { label: "States", path: "/states", permission: "", icon: Building2 },
   { label: "Cities", path: "/city", permission: "", icon: Building2 },
   { label: "Vehicle", path: "/vehicle", permission: "", icon: CarTaxiFront },
   { label: "Route", path: "/route", permission: "", icon: Road },
+  { label: "RouteFare", path: "/routefare", permission: "", icon: Banknote },
 
   {
     label: "Role & Permission",
