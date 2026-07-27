@@ -59,6 +59,8 @@ const RouteFareTable = () => {
 
   const [data, setData] = useState<RouteFareType[]>([]);
   const [statelist, setStatelist] = useState<any[]>([]);
+  const [vehiclelist, setVehiclelist] = useState<any[]>([]);
+
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [newPage, setNewPage] = useState(1);
   const [dataCount, setDataCount] = useState(0);
@@ -125,6 +127,7 @@ const RouteFareTable = () => {
   };
   useEffect(() => {
     handleGetStateList();
+    handleGetVehicleList();
   }, []);
   useEffect(() => {
     getData();
@@ -133,7 +136,7 @@ const RouteFareTable = () => {
   const handleGetStateList = async () => {
     try {
       let res = await axios.post(
-        process.env.apiUrl + "/api/dropdown-fare",
+        process.env.apiUrl + "/api/dropdown-route",
 
         { withCredentials: true },
       );
@@ -151,8 +154,30 @@ const RouteFareTable = () => {
       }
     }
   };
+  const handleGetVehicleList = async () => {
+    try {
+      let res = await axios.post(
+        process.env.apiUrl + "/api/dropdown-vehicle",
+
+        { withCredentials: true },
+      );
+      console.log(res?.data?.data, "sdf");
+
+      // UI state update
+      setVehiclelist(res?.data?.data);
+    } catch (error: any) {
+      if (error?.response?.data?.error) {
+        setError(error?.response?.data?.error);
+        toast.error(error?.response?.data?.error);
+      } else {
+        setError("Error.");
+        toast.error("Error.");
+      }
+    }
+  };
   // ✅ CREATE / UPDATE
   const handleSave = async () => {
+    
     try {
       setLoading(true);
       console.log(formData);
@@ -189,43 +214,45 @@ const RouteFareTable = () => {
       //     return updatedList;
       //   }
       // });
-setData((prev) => {
-  if (formData.id) {
-    // EDIT CASE
-    return prev.map((item) =>
-      item._id === addedOrUpdated._id
-        ? {
-            ...addedOrUpdated,
+      setData((prev) => {
+        
+        if (formData.id) {
+          console.log(formData.id, " ghsdfdsf  ew123");
+          // EDIT CASE
+          return prev.map((item) =>
+            item._id === addedOrUpdated._id
+              ? {
+                  ...addedOrUpdated,
 
-            route_id:
-              typeof addedOrUpdated.route_id === "object"
-                ? addedOrUpdated.route_id
-                : item.route_id,
+                  route_id:
+                    typeof addedOrUpdated.route_id === "object"
+                      ? addedOrUpdated.route_id
+                      : item.route_id,
 
-            vehicle_id:
-              typeof addedOrUpdated.vehicle_id === "object"
-                ? addedOrUpdated.vehicle_id
-                : item.vehicle_id,
+                  vehicle_id:
+                    typeof addedOrUpdated.vehicle_id === "object"
+                      ? addedOrUpdated.vehicle_id
+                      : item.vehicle_id,
+                }
+              : item,
+          );
+        } else {
+          // ADD CASE
+          let updatedList = [...prev];
+
+          if (updatedList.length >= rowsPerPage) {
+            updatedList = updatedList.filter(
+              (_, index) => index !== updatedList.length - 1,
+            );
           }
-        : item,
-    );
-  } else {
-    // ADD CASE
-    let updatedList = [...prev];
 
-    if (updatedList.length >= rowsPerPage) {
-      updatedList = updatedList.filter(
-        (_, index) => index !== updatedList.length - 1,
-      );
-    }
+          if (addedOrUpdated) {
+            updatedList.unshift(addedOrUpdated);
+          }
 
-    if (addedOrUpdated) {
-      updatedList.unshift(addedOrUpdated);
-    }
-
-    return updatedList;
-  }
-});
+          return updatedList;
+        }
+      });
       if (!formData.id) {
         setDataCount((prevCount) => prevCount + 1);
       }
@@ -303,7 +330,7 @@ setData((prev) => {
   const setEditData = (item: RouteFareType) => {
     const fromRouteId = item.route_id?._id || "";
     const fromVehicleId = item.vehicle_id?._id || "";
-
+    console.log(item);
     setFormData({
       id: item._id,
       route_id: fromRouteId,
@@ -384,7 +411,7 @@ setData((prev) => {
               <th className="px-4 py-2">#</th>
               <th className="px-4 py-2">Action</th>
               <th className="px-4 py-2">Status</th>
-        
+
               {[
                 { col: "route_id", label: "Route id" },
                 { col: "vehicle_id", label: "Vehicle id" },
@@ -439,10 +466,7 @@ setData((prev) => {
           ) : (
             <tbody className="text-lg font-semibold text-gray-900">
               {data?.map((item, index) => (
-                <tr
-                
-                  className="bg-white border-b align-top border-gray-300 text-[1.05rem] text-gray-900 hover:bg-gray-50 even:bg-gray-50"
-                >
+                <tr className="bg-white border-b align-top border-gray-300 text-[1.05rem] text-gray-900 hover:bg-gray-50 even:bg-gray-50">
                   <td className="px-5 py-4 text-center">
                     {(newPage - 1) * rowsPerPage + index + 1}
                   </td>
@@ -539,8 +563,12 @@ setData((prev) => {
                     </span>
                   </td>
 
-                  <td className="px-4 py-4 text-center">{item.route_id.slug}</td>
-                  <td className="px-4 py-4 text-center">{item.vehicle_id.name}</td>
+                  <td className="px-4 py-4 text-center">
+                    {item.route_id.slug}
+                  </td>
+                  <td className="px-4 py-4 text-center">
+                    {item.vehicle_id.name}
+                  </td>
 
                   <td className="px-4 py-4 text-center">{item.tripType}</td>
                   <td className="px-4 py-4 text-center">{item.baseFare}</td>
@@ -693,15 +721,11 @@ setData((prev) => {
                 name="route_id"
                 value={formData.route_id}
                 onChange={handleInput}
-                className="border w-full p-2 rounded bg-white"
+                className="w-full rounded border bg-white p-2"
               >
                 <option value="">Select Route</option>
 
-                {[
-                  ...new Map(
-                    statelist.map((fare) => [fare.route_id._id, fare.route_id]),
-                  ).values(),
-                ].map((route) => (
+                {statelist.map((route) => (
                   <option key={route._id} value={route._id}>
                     {route.slug}
                   </option>
@@ -711,18 +735,11 @@ setData((prev) => {
                 name="vehicle_id"
                 value={formData.vehicle_id}
                 onChange={handleInput}
-                className="border w-full p-2 rounded bg-white"
+                className="w-full rounded border bg-white p-2"
               >
                 <option value="">Select Vehicle</option>
 
-                {[
-                  ...new Map(
-                    statelist.map((fare) => [
-                      fare.vehicle_id._id,
-                      fare.vehicle_id,
-                    ]),
-                  ).values(),
-                ].map((vehicle) => (
+                {vehiclelist.map((vehicle) => (
                   <option key={vehicle._id} value={vehicle._id}>
                     {vehicle.name}
                   </option>
