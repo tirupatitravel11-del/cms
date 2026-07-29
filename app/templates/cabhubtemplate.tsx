@@ -1,292 +1,617 @@
 "use client";
 
+import axios from "axios";
 import { useState } from "react";
+import toast from "react-hot-toast";
+
+type Vehicle = {
+  category: string;
+  brand: string;
+  name: string;
+  seats: string;
+  luggage: string;
+  acType: string;
+  fuelType: string;
+  image: string;
+  features: string;
+  slug: string;
+};
+
+type FareDetail = {
+  // vehicle: string;
+  localFare: string;
+  roundTripFare: string;
+  oneWayFare: string;
+};
+
+type FAQ = {
+  question: string;
+  answer: string;
+  displayOrder: number;
+  status: boolean;
+};
+
+type Route = {
+  fromCity: string;
+  toCity: string;
+  startingFare: string;
+  slug: string;
+  displayOrder: number;
+  status: boolean;
+};
 
 export default function CabHubTemplateForm() {
-  const [pageData, setPageData] = useState({
-    // Hero
-    Title: "",
+  // =====================================================
+  // FORM DATA
+  // =====================================================
 
+  const [formData, setFormData] = useState({
+    // Basic
+    title: "",
+    cityName: "",
+    startingFare: "",
+
+    // Hero
+    badgeText: "",
+    heroHeading: "",
     heroDescription: "",
 
     // City Introduction
     sectionHeading: "",
     sectionDescription: "",
 
-    //fleet
-    vehicleHeading: "",
+    // About Location
+    overview: "",
+    famousFor: [] as string[],
+    localCuisine: [] as string[],
+    bestToVisit: "",
+    idealFor: [] as string[],
+    nearestAirport: "",
+    nearestRailway: "",
 
-    vehicleDescription: "",
+    // Route Information
+    fromCity: "",
+    toCity: "",
+
+    localFareDetail: "",
+    startingFareDetail: "",
+    oneWayFare: "",
+
+    routeCondition: "",
+    distance: "",
+    travelTime: "",
+    popularPlaces: [] as string[],
+    hotels: [] as string[],
+    restaurants: [] as string[],
+
+    // Fare Section
+    fareHeading: "",
+
+    // FAQ Section
+    faqHeading: "",
+    faqDescription: "",
+
+    // Outstation Section
+    routeHeading: "",
+    routeDescription: "",
+
+    // SEO
+    seo: {
+      metaTitle: "",
+      metaDescription: "",
+      metaKeywords: [] as string[],
+      canonicalUrl: "",
+      ogTitle: "",
+      ogDescription: "",
+      ogImage: "",
+      robots: "index,follow",
+      schemaMarkup: "",
+    },
+
+    // Multiple Data
+    vehicles: [] as Vehicle[],
+    fareDetails: [] as FareDetail[],
+    faqs: [] as FAQ[],
+    routes: [] as Route[],
   });
+const [metaKeywordsInput, setMetaKeywordsInput] = useState("");
+  // =====================================================
+  // BASIC INPUT CHANGE
+  // =====================================================
 
-  const [vehicles, setVehicles] = useState([
-    {
-      category: "",
-      brand: "",
-      name: "",
-      seats: "",
-      luggage: "",
-      acType: "AC",
-      fuelType: " ",
-      localFare: "",
-      oneWayFare: "",
-      roundTripFare: "",
-      slug: "",
-      features: "",
-    },
-  ]);
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
 
-  const [fareDetails, setFareDetails] = useState([
-    {
-      vehicle_id: "",
-      localFare: "",
-      roundTripFare: "",
-      oneWayFare: "",
-      displayOrder: "",
-      status: "true",
-    },
-  ]);
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
-  const [faqs, setFaqs] = useState([
-    {
-      question: "",
-      answer: "",
-      displayOrder: "",
-      status: "true",
-    },
-  ]);
+  // =====================================================
+  // SEO CHANGE
+  // =====================================================
 
-  const [routes, setRoutes] = useState([
-    {
-      fromCity: "",
-      toCity: "",
-      startingFare: "",
-      slug: "",
-      displayOrder: "",
-      status: "true",
-    },
-  ]);
-  const [formData, setFormData] = useState({
-//    title="",
-// cityName="",
-// startingFare="",
-// overview=" ",
-// FamousFor=[],
-// localCuisine=[],
-// bestToVisit="",
-// idealFor=[],
-// nearestAirport="",
-// nearestRailway="",
-// popularPlaces=[],
-// hotels=[],
-// restaurants=[],
-// //  seo: {
-//     metaTitle: "",
-//     metaDescription: "",
-//     metaKeywords: [],
+  const handleSeoChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { name, value } = e.target;
 
-//     canonicalUrl: "",
+    setFormData((prev) => ({
+      ...prev,
+      seo: {
+        ...prev.seo,
+        [name]: value,
+      },
+    }));
+  };
 
-//     ogTitle: "",
-//     ogDescription: "",
-//     ogImage: "",
+  // =====================================================
+  // VEHICLE
+  // =====================================================
 
-//     robots: "index,follow",
-
-//     schemaMarkup: "",
-//   },
-// fareDetails: [
-//   {
-//     vehicle: "",
-//     localFare: "",
-//     roundTripFare: "",
-//     oneWayFare: "",
-//   },
-// ]
-// faqs: [
-//   {
-//     question: "",
-//     answer: "",
-//     displayOrder: 1,
-//     status: true,
-//   },
-// ]
-// routes: [
-//   {
-//     fromCity: "",
-//     toCity: "",
-//     startingFare: "",
-//     slug: "",
-
-   
-//   },
-// ]
-
-
-});
-
- const handleChange = (
-  e: React.ChangeEvent<
-    HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-  >
-) => {
-  const { name, value } = e.target;
-
-  setFormData((prev) => ({
-    ...prev,
-    [name]: value,
-  }));
-};
-
-
-  const handleVehicleChange = (index: number, field: string, value: string) => {
-    const updated = [...vehicles];
-
-    updated[index] = {
-      ...updated[index],
-      [field]: value,
-    };
-
-    setVehicles(updated);
+  const emptyVehicle: Vehicle = {
+    category: "",
+    brand: "",
+    name: "",
+    seats: "",
+    luggage: "",
+    acType: "AC",
+    fuelType: "Petrol",
+    image: "",
+    features: "",
+    slug: "",
   };
 
   const addVehicle = () => {
-    setVehicles([
-      ...vehicles,
-      {
-        category: "",
-        brand: "",
-        name: "",
-        seats: "",
-        luggage: "",
-        acType: "AC",
-        fuelType: "Petrol",
-        localFare: "",
-        oneWayFare: "",
-        roundTripFare: "",
-        slug: "",
-        features: "",
-      },
-    ]);
+    setFormData((prev) => ({
+      ...prev,
+      vehicles: [...prev.vehicles, { ...emptyVehicle }],
+    }));
   };
 
   const removeVehicle = (index: number) => {
-    setVehicles(vehicles.filter((_, i) => i !== index));
-  };
-  const addFare = () => {
-    setFareDetails([
-      ...fareDetails,
-      {
-        vehicle_id: "",
-        localFare: "",
-        roundTripFare: "",
-        oneWayFare: "",
-        displayOrder: "",
-        status: "true",
-      },
-    ]);
+    setFormData((prev) => ({
+      ...prev,
+      vehicles: prev.vehicles.filter((_, i) => i !== index),
+    }));
   };
 
-  const removeFare = (index: number) => {
-    setFareDetails(fareDetails.filter((_, i) => i !== index));
-  };
+  const handleVehicleChange = (
+    index: number,
+    field: keyof Vehicle,
+    value: string,
+  ) => {
+    setFormData((prev) => {
+      const vehicles = [...prev.vehicles];
 
-  const handleFareChange = (index: number, field: string, value: string) => {
-    const updated = [...fareDetails];
-    updated[index] = {
-      ...updated[index],
-      [field]: value,
-    };
+      vehicles[index] = {
+        ...vehicles[index],
+        [field]: value,
+      };
 
-    setFareDetails(updated);
-  };
-
-  const addFaq = () => {
-    setFaqs([
-      ...faqs,
-      {
-        question: "",
-        answer: "",
-        displayOrder: "",
-        status: "true",
-      },
-    ]);
-  };
-
-  const removeFaq = (index: number) => {
-    setFaqs(faqs.filter((_, i) => i !== index));
-  };
-
-  const handleFaqChange = (index: number, field: string, value: string) => {
-    const updated = [...faqs];
-
-    updated[index] = {
-      ...updated[index],
-      [field]: value,
-    };
-
-    setFaqs(updated);
-  };
-
-  const addRoute = () => {
-    setRoutes([
-      ...routes,
-      {
-        fromCity: "",
-        toCity: "",
-        startingFare: "",
-        slug: "",
-        displayOrder: "",
-        status: "true",
-      },
-    ]);
-  };
-
-  const removeRoute = (index: number) => {
-    setRoutes(routes.filter((_, i) => i !== index));
-  };
-
-  const handleRouteChange = (index: number, field: string, value: string) => {
-    const updated = [...routes];
-
-    updated[index] = {
-      ...updated[index],
-      [field]: value,
-    };
-
-    setRoutes(updated);
-  };
-
-  const handleSubmit = () => {
-    console.log({
-      ...pageData,
-      vehicles,
+      return {
+        ...prev,
+        vehicles,
+      };
     });
   };
 
-  return (
-    <div className="max-w-6xl mx-auto space-y-8 text-black">
-      {/* HERO SECTION */}
-      <div className="rounded-xl border bg-white p-6 shadow-sm">
-        <h2 className="mb-6 border-b pb-3 text-2xl font-bold">Main Heading</h2>
+  // =====================================================
+  // FARE DETAILS
+  // =====================================================
 
-        <div className="space-y-5">
+  const emptyFare: FareDetail = {
+    // vehicle: "",
+    localFare: "",
+    roundTripFare: "",
+    oneWayFare: "",
+  };
+
+  const addFare = () => {
+    setFormData((prev) => ({
+      ...prev,
+      fareDetails: [...prev.fareDetails, { ...emptyFare }],
+    }));
+  };
+
+  const removeFare = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      fareDetails: prev.fareDetails.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleFareChange = (
+    index: number,
+    field: keyof FareDetail,
+    value: string,
+  ) => {
+    setFormData((prev) => {
+      const fareDetails = [...prev.fareDetails];
+
+      fareDetails[index] = {
+        ...fareDetails[index],
+        [field]: value,
+      };
+
+      return {
+        ...prev,
+        fareDetails,
+      };
+    });
+  };
+
+  // =====================================================
+  // FAQ
+  // =====================================================
+
+  const emptyFaq: FAQ = {
+    question: "",
+    answer: "",
+    displayOrder: 1,
+    status: true,
+  };
+
+  const addFaq = () => {
+    setFormData((prev) => ({
+      ...prev,
+      faqs: [
+        ...prev.faqs,
+        {
+          ...emptyFaq,
+          displayOrder: prev.faqs.length + 1,
+        },
+      ],
+    }));
+  };
+
+  const removeFaq = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      faqs: prev.faqs.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleFaqChange = (
+    index: number,
+    field: keyof FAQ,
+    value: string | boolean | number,
+  ) => {
+    setFormData((prev) => {
+      const faqs = [...prev.faqs];
+
+      faqs[index] = {
+        ...faqs[index],
+        [field]: value,
+      };
+
+      return {
+        ...prev,
+        faqs,
+      };
+    });
+  };
+
+  // =====================================================
+  // ROUTES
+  // =====================================================
+
+  const emptyRoute: Route = {
+    fromCity: "",
+    toCity: "",
+    startingFare: "",
+    slug: "",
+    displayOrder: 1,
+    status: true,
+  };
+
+  const addRoute = () => {
+    setFormData((prev) => ({
+      ...prev,
+      routes: [
+        ...prev.routes,
+        {
+          ...emptyRoute,
+          displayOrder: prev.routes.length + 1,
+        },
+      ],
+    }));
+  };
+
+  const removeRoute = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      routes: prev.routes.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleRouteChange = (
+    index: number,
+    field: keyof Route,
+    value: string | boolean | number,
+  ) => {
+    setFormData((prev) => {
+      const routes = [...prev.routes];
+
+      routes[index] = {
+        ...routes[index],
+        [field]: value,
+      };
+
+      return {
+        ...prev,
+        routes,
+      };
+    });
+  };
+
+  // =====================================================
+  // ARRAY TEXT INPUT
+  // =====================================================
+
+  const handleArrayChange = (
+    field:
+      | "famousFor"
+      | "localCuisine"
+      | "idealFor"
+      | "popularPlaces"
+      | "hotels"
+      | "restaurants",
+    value: string,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value.split(","),
+    }));
+  };
+
+  // =====================================================
+  // SEO KEYWORDS
+  // =====================================================
+
+const handleSeoKeywordsChange = (value: string) => {
+  setMetaKeywordsInput(value);
+
+  setFormData((prev) => ({
+    ...prev,
+    seo: {
+      ...prev.seo,
+      metaKeywords: value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    },
+  }));
+};
+  // =====================================================
+  // SUBMIT
+  // =====================================================
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+
+
+    try {
+      const response = await axios.post(
+        process.env.apiUrl + "/api/create-update-cab-hub-page",
+        formData,
+        {
+          withCredentials: true,
+        },
+      );
+   if (response.data.success) {
+      toast.success(response.data.message || "Data created successfully.");
+
+      // Reset form only after successful API response
+      setFormData(getInitialFormData());
+        setMetaKeywordsInput("");
+    }
+    } catch (error: unknown) {
+    console.error(error);
+
+    if (axios.isAxiosError(error)) {
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again."
+      );
+    } else {
+      toast.error("Something went wrong. Please try again.");
+    }
+  }
+  };
+
+  // =====================================================
+  // JSX
+  // =====================================================
+const getInitialFormData = () => ({
+  // Basic
+  title: "",
+  cityName: "",
+  startingFare: "",
+
+  // Hero
+  badgeText: "",
+  heroHeading: "",
+  heroDescription: "",
+
+  // City Introduction
+  sectionHeading: "",
+  sectionDescription: "",
+
+  // About Location
+  overview: "",
+  famousFor: [] as string[],
+  localCuisine: [] as string[],
+  bestToVisit: "",
+  idealFor: [] as string[],
+  nearestAirport: "",
+  nearestRailway: "",
+
+  // Route Information
+  fromCity: "",
+  toCity: "",
+
+  localFareDetail: "",
+  startingFareDetail: "",
+  oneWayFare: "",
+
+  routeCondition: "",
+  distance: "",
+  travelTime: "",
+  popularPlaces: [] as string[],
+  hotels: [] as string[],
+  restaurants: [] as string[],
+
+  // Fare Section
+  fareHeading: "",
+
+  // FAQ Section
+  faqHeading: "",
+  faqDescription: "",
+
+  // Outstation Section
+  routeHeading: "",
+  routeDescription: "",
+
+  // SEO
+  seo: {
+    metaTitle: "",
+    metaDescription: "",
+    metaKeywords: [] as string[],
+    canonicalUrl: "",
+    ogTitle: "",
+    ogDescription: "",
+    ogImage: "",
+    robots: "index,follow",
+    schemaMarkup: "",
+  },
+
+  // Multiple Data
+  vehicles: [] as Vehicle[],
+  fareDetails: [] as FareDetail[],
+  faqs: [] as FAQ[],
+  routes: [] as Route[],
+});
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto max-w-6xl space-y-8 text-black"
+    >
+      {/* =====================================================
+          SEO
+      ===================================================== */}
+
+      <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <h2 className="mb-6 border-b pb-3 text-2xl font-bold">SEO Settings</h2>
+
+        <div className="grid gap-5 md:grid-cols-2">
           <div>
-            <label className="mb-2 block font-medium">Title</label>
+            <label className="mb-2 block font-medium">Meta Title</label>
 
             <input
               type="text"
-              name="Title"
-              value={pageData.Title}
+              name="metaTitle"
+              value={formData.seo.metaTitle}
+              onChange={handleSeoChange}
+              placeholder="Lucknow Taxi Service | Book Cabs"
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block font-medium">Canonical URL</label>
+
+            <input
+              type="text"
+              name="canonicalUrl"
+              value={formData.seo.canonicalUrl}
+              onChange={handleSeoChange}
+              placeholder="https://example.com/cabs/lucknow"
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="mb-2 block font-medium">Meta Description</label>
+
+            <textarea
+              rows={3}
+              name="metaDescription"
+              value={formData.seo.metaDescription}
+              onChange={handleSeoChange}
+              placeholder="Book affordable and reliable Lucknow taxi services..."
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
+
+          <div className="md:col-span-2">
+            <label className="mb-2 block font-medium">Meta Keywords</label>
+
+            <input
+  type="text"
+  value={metaKeywordsInput}
+  onChange={(e) => handleSeoKeywordsChange(e.target.value)}
+  placeholder="Lucknow Taxi, Lucknow Cab, Lucknow Cab Service"
+  className="w-full rounded-lg border p-3"
+/>
+
+            <p className="mt-1 text-sm text-gray-500">
+              Separate keywords with commas.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* =====================================================
+    ROUTE INFORMATION
+===================================================== */}
+
+      <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <h2 className="mb-6 border-b pb-3 text-2xl font-bold">
+          Route Information
+        </h2>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          {/* From City */}
+          <div>
+            <label className="mb-2 block font-medium">From City</label>
+
+            <input
+              type="text"
+              name="fromCity"
+              value={formData.fromCity}
               onChange={handleChange}
-              placeholder="Cabs You Can Trust."
+              placeholder="Lucknow"
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
+
+          {/* To City */}
+          <div>
+            <label className="mb-2 block font-medium">To City</label>
+
+            <input
+              type="text"
+              name="toCity"
+              value={formData.toCity}
+              onChange={handleChange}
+              placeholder="Ayodhya"
               className="w-full rounded-lg border p-3"
             />
           </div>
         </div>
       </div>
 
-      {/* CITY INTRODUCTION */}
+      {/* =====================================================
+    CITY INTRODUCTION
+===================================================== */}
+
       <div className="rounded-xl border bg-white p-6 shadow-sm">
         <h2 className="mb-6 border-b pb-3 text-2xl font-bold">
           City Introduction
@@ -300,7 +625,7 @@ export default function CabHubTemplateForm() {
             <input
               type="text"
               name="cityName"
-               value={pageData.city}
+              value={formData.cityName}
               onChange={handleChange}
               placeholder="Lucknow"
               className="w-full rounded-lg border p-3"
@@ -316,6 +641,8 @@ export default function CabHubTemplateForm() {
             <input
               type="number"
               name="startingFare"
+              value={formData.startingFare}
+              onChange={handleChange}
               placeholder="9"
               className="w-full rounded-lg border p-3"
             />
@@ -323,64 +650,51 @@ export default function CabHubTemplateForm() {
         </div>
       </div>
 
-      {/* Fare Details */}
-      <div className="mt-8 rounded-lg border bg-stone-50 p-5">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-xl font-semibold">Vehicle Fare Details</h3>
+      {/* =====================================================
+          FARE TABLE
+      ===================================================== */}
+
+      <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center justify-between border-b pb-3">
+          <h2 className="text-2xl font-bold">Fare Table Section</h2>
 
           <button
             type="button"
             onClick={addFare}
-            className="rounded-lg bg-gold px-5 py-2 font-semibold text-black border-2 border-black hover:opacity-90"
+            className="rounded-lg bg-gold px-5 py-2 font-semibold text-black"
           >
             + Add Fare
           </button>
         </div>
 
-        {fareDetails.map((fare, index) => (
-          <div
-            key={index}
-            className="mb-8 rounded-lg border bg-white p-5 shadow-sm"
-          >
-            {/* Header */}
-            <div className="mb-5 flex items-center justify-between">
-              <h4 className="text-lg font-semibold">Fare {index + 1}</h4>
+        <div>
+          <label className="mb-2 block font-medium">Fare Table Heading</label>
 
-              {fareDetails.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeFare(index)}
-                  className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-                >
-                  Remove
-                </button>
-              )}
+          <input
+            type="text"
+            name="fareHeading"
+            value={formData.fareHeading}
+            onChange={handleChange}
+            placeholder="Lucknow Cab Fare & Vehicle Details"
+            className="w-full rounded-lg border p-3"
+          />
+        </div>
+
+        {formData.fareDetails.map((fare, index) => (
+          <div key={index} className="mt-8 rounded-lg border bg-stone-50 p-5">
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Fare {index + 1}</h3>
+
+              <button
+                type="button"
+                onClick={() => removeFare(index)}
+                className="rounded-lg bg-red-500 px-4 py-2 text-white"
+              >
+                Remove
+              </button>
             </div>
 
             <div className="grid gap-5 md:grid-cols-2">
-              {/* Vehicle */}
-              <div>
-                <label className="mb-2 block font-medium">Vehicle</label>
-
-                <select
-                  value={fare.vehicle_id}
-                  onChange={(e) =>
-                    handleFareChange(index, "vehicle_id", e.target.value)
-                  }
-                  className="w-full rounded-lg border p-3"
-                >
-                  <option value="">Select Vehicle</option>
-                  <option value="1">Swift</option>
-                  <option value="2">Dzire</option>
-                  <option value="3">Ertiga</option>
-                  <option value="4">Innova</option>
-                  <option value="5">Innova Crysta</option>
-                  <option value="6">Scorpio</option>
-                </select>
-              </div>
-
-              {/* Local Fare */}
               <div>
                 <label className="mb-2 block font-medium">
                   Local Fare (₹/km)
@@ -392,11 +706,11 @@ export default function CabHubTemplateForm() {
                   onChange={(e) =>
                     handleFareChange(index, "localFare", e.target.value)
                   }
+                  placeholder="10"
                   className="w-full rounded-lg border p-3"
                 />
               </div>
 
-              {/* Round Trip */}
               <div>
                 <label className="mb-2 block font-medium">
                   Round Trip Fare (₹/km)
@@ -408,11 +722,11 @@ export default function CabHubTemplateForm() {
                   onChange={(e) =>
                     handleFareChange(index, "roundTripFare", e.target.value)
                   }
+                  placeholder="9"
                   className="w-full rounded-lg border p-3"
                 />
               </div>
 
-              {/* One Way */}
               <div>
                 <label className="mb-2 block font-medium">
                   One Way Fare (₹/km)
@@ -424,6 +738,7 @@ export default function CabHubTemplateForm() {
                   onChange={(e) =>
                     handleFareChange(index, "oneWayFare", e.target.value)
                   }
+                  placeholder="11"
                   className="w-full rounded-lg border p-3"
                 />
               </div>
@@ -432,160 +747,180 @@ export default function CabHubTemplateForm() {
         ))}
       </div>
 
-      {/* City Details */}
+      {/* =====================================================
+    VEHICLE FARE DETAILS
+===================================================== */}
+
+      {/* =====================================================
+          ABOUT LOCATION
+      ===================================================== */}
+
       <div className="rounded-xl border bg-white p-6 shadow-sm">
         <h2 className="mb-6 border-b pb-3 text-2xl font-bold">
-          About Location Section
+          About Location
         </h2>
 
-        <div className="grid gap-5">
-          {/* City */}
-          <div>
-            <label className="mb-2 block font-medium">City Name</label>
-            <input
-              type="text"
-              name="city"
-              placeholder="Lucknow"
-              className="w-full rounded-lg border p-3"
-            />
-          </div>
-
-          {/* Overview */}
+        <div className="space-y-5">
           <div>
             <label className="mb-2 block font-medium">Overview</label>
+
             <textarea
               rows={5}
               name="overview"
-              placeholder="Write about the city..."
+              value={formData.overview}
+              onChange={handleChange}
+              placeholder="Write overview..."
               className="w-full rounded-lg border p-3"
             />
           </div>
 
-          {/* Famous For */}
           <div>
             <label className="mb-2 block font-medium">Famous For</label>
 
-            <textarea
-              rows={3}
-              name="famousFor"
-              placeholder="Nawabi Heritage, Bara Imambara, Chikankari..."
+            <input
+              type="text"
+              value={formData.famousFor.join(",")}
+              onChange={(e) => handleArrayChange("famousFor", e.target.value)}
+              placeholder="Bara Imambara, Chikankari, Awadhi Culture"
               className="w-full rounded-lg border p-3"
             />
 
             <p className="mt-1 text-sm text-gray-500">
-              Separate values using commas (,)
+              Separate items with commas.
             </p>
           </div>
 
-          {/* Local Cuisine */}
           <div>
             <label className="mb-2 block font-medium">Local Cuisine</label>
 
-            <textarea
-              rows={3}
-              name="localCuisine"
-              placeholder="Tunday Kebab, Lucknowi Biryani..."
+            <input
+              type="text"
+              value={formData.localCuisine.join(",")}
+              onChange={(e) =>
+                handleArrayChange("localCuisine", e.target.value)
+              }
+              placeholder="Tunday Kababi, Biryani, Basket Chaat"
               className="w-full rounded-lg border p-3"
             />
-
-            <p className="mt-1 text-sm text-gray-500">
-              Separate values using commas (,)
-            </p>
           </div>
 
-          {/* Best Time */}
           <div>
             <label className="mb-2 block font-medium">Best Time to Visit</label>
 
             <input
               type="text"
-              name="bestTimeToVisit"
+              name="bestToVisit"
+              value={formData.bestToVisit}
+              onChange={handleChange}
               placeholder="October to March"
               className="w-full rounded-lg border p-3"
             />
           </div>
 
-          {/* Ideal For */}
           <div>
             <label className="mb-2 block font-medium">Ideal For</label>
 
-            <textarea
-              rows={3}
-              name="idealFor"
-              placeholder="Bara Imambara, Hazratganj, Rumi Darwaza..."
-              className="w-full rounded-lg border p-3"
-            />
-
-            <p className="mt-1 text-sm text-gray-500">
-              Separate values using commas (,)
-            </p>
-          </div>
-
-          {/* Airport */}
-          <div>
-            <label className="mb-2 block font-medium">Nearest Airport</label>
-
             <input
               type="text"
-              name="nearestAirport"
-              placeholder="Chaudhary Charan Singh International Airport"
+              value={formData.idealFor.join(",")}
+              onChange={(e) => handleArrayChange("idealFor", e.target.value)}
+              placeholder="Family Trips, Business Travel, Airport Transfers"
               className="w-full rounded-lg border p-3"
             />
           </div>
 
-          {/* Railway */}
-          <div>
-            <label className="mb-2 block font-medium">
-              Nearest Railway Station
-            </label>
+          <div className="grid gap-5 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block font-medium">Nearest Airport</label>
 
-            <input
-              type="text"
-              name="nearestRailwayStation"
-              placeholder="Lucknow Charbagh Railway Station"
-              className="w-full rounded-lg border p-3"
-            />
+              <input
+                type="text"
+                name="nearestAirport"
+                value={formData.nearestAirport}
+                onChange={handleChange}
+                placeholder="Chaudhary Charan Singh International Airport"
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block font-medium">
+                Nearest Railway Station
+              </label>
+
+              <input
+                type="text"
+                name="nearestRailway"
+                value={formData.nearestRailway}
+                onChange={handleChange}
+                placeholder="Lucknow Charbagh Railway Station"
+                className="w-full rounded-lg border p-3"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* FAQ Details */}
-      <div className="mt-8 rounded-lg border bg-stone-50 p-5">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <h3 className="text-xl font-semibold">FAQ Details</h3>
+      {/* =====================================================
+          FAQ
+      ===================================================== */}
+
+      <div className="rounded-xl border bg-white p-6 shadow-sm">
+        <div className="mb-6 flex items-center justify-between border-b pb-3">
+          <h2 className="text-2xl font-bold">FAQ Section</h2>
 
           <button
             type="button"
             onClick={addFaq}
-            className="rounded-lg bg-gold px-5 py-2 font-semibold text-black border-2 border-black hover:opacity-90"
+            className="rounded-lg bg-gold px-5 py-2 font-semibold text-black"
           >
             + Add FAQ
           </button>
         </div>
 
-        {faqs.map((faq, index) => (
-          <div
-            key={index}
-            className="mb-8 rounded-lg border bg-white p-5 shadow-sm"
-          >
-            {/* Header */}
-            <div className="mb-5 flex items-center justify-between">
-              <h4 className="text-lg font-semibold">FAQ {index + 1}</h4>
+        <div className="space-y-5">
+          <div>
+            <label className="mb-2 block font-medium">Question</label>
 
-              {faqs.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeFaq(index)}
-                  className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-                >
-                  Remove
-                </button>
-              )}
+            <input
+              type="text"
+              name="faqHeading"
+              value={formData.faqHeading}
+              onChange={handleChange}
+              placeholder="Lucknow Cab Service FAQs"
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block font-medium">Answer</label>
+
+            <textarea
+              rows={3}
+              name="faqDescription"
+              value={formData.faqDescription}
+              onChange={handleChange}
+              placeholder="..."
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
+        </div>
+
+        {formData.faqs.map((faq, index) => (
+          <div key={index} className="mt-8 rounded-lg border bg-stone-50 p-5">
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">FAQ {index + 1}</h3>
+
+              <button
+                type="button"
+                onClick={() => removeFaq(index)}
+                className="rounded-lg bg-red-500 px-4 py-2 text-white"
+              >
+                Remove
+              </button>
             </div>
 
-            <div className="grid gap-5">
-              {/* Question */}
+            <div className="space-y-5">
               <div>
                 <label className="mb-2 block font-medium">Question</label>
 
@@ -595,11 +930,11 @@ export default function CabHubTemplateForm() {
                   onChange={(e) =>
                     handleFaqChange(index, "question", e.target.value)
                   }
+                  placeholder="What is the taxi fare?"
                   className="w-full rounded-lg border p-3"
                 />
               </div>
 
-              {/* Answer */}
               <div>
                 <label className="mb-2 block font-medium">Answer</label>
 
@@ -609,367 +944,348 @@ export default function CabHubTemplateForm() {
                   onChange={(e) =>
                     handleFaqChange(index, "answer", e.target.value)
                   }
+                  placeholder="Taxi fares start from..."
                   className="w-full rounded-lg border p-3"
                 />
               </div>
 
-              <div className="grid gap-5 md:grid-cols-2"></div>
+              <div className="grid gap-5 md:grid-cols-2">
+                <div>
+                  <label className="mb-2 block font-medium">
+                    Display Order
+                  </label>
+
+                  <input
+                    type="number"
+                    value={faq.displayOrder}
+                    onChange={(e) =>
+                      handleFaqChange(
+                        index,
+                        "displayOrder",
+                        Number(e.target.value),
+                      )
+                    }
+                    className="w-full rounded-lg border p-3"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block font-medium">Status</label>
+
+                  <select
+                    value={faq.status ? "true" : "false"}
+                    onChange={(e) =>
+                      handleFaqChange(
+                        index,
+                        "status",
+                        e.target.value === "true",
+                      )
+                    }
+                    className="w-full rounded-lg border p-3"
+                  >
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                  </select>
+                </div>
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* City near by */}
+      {/* =====================================================
+          ROUTE INFORMATION DETAILS
+      ===================================================== */}
+
       <div className="rounded-xl border bg-white p-6 shadow-sm">
         <h2 className="mb-6 border-b pb-3 text-2xl font-bold">
-          Outstation Routes Section
+          Route Information Details
         </h2>
 
-        {/* ROUTE INFO SECTION */}
-        <div className="rounded-xl border bg-white p-6 shadow-sm">
-          <h2 className="mb-6 border-b pb-3 text-2xl font-bold">Route Info</h2>
+        <div className="grid gap-5 md:grid-cols-2">
+          <div>
+            <label className="mb-2 block font-medium">From City</label>
 
-          {/* Basic Route Information */}
-          <div className="space-y-5">
-            <div>
-              <label className="mb-2 block font-medium">Route Title</label>
-
-              <input
-                type="text"
-                name="routeTitle"
-                placeholder="Lucknow to Ayodhya Cab"
-                className="w-full rounded-lg border p-3"
-              />
-            </div>
-          </div>
-
-          {/* Distance / Time / Road Condition */}
-          <div className="mt-8 rounded-lg border bg-stone-50 p-5">
-            <h3 className="mb-5 text-lg font-semibold">Route Details</h3>
-
-            <div className="grid gap-5 md:grid-cols-2">
-              {/* Distance */}
-              <div>
-                <label className="mb-2 block font-medium">Distance</label>
-
-                <input
-                  type="text"
-                  name="distance"
-                  placeholder="135 km"
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-
-              {/* Travel Time */}
-              <div>
-                <label className="mb-2 block font-medium">
-                  Approx. Travel Time
-                </label>
-
-                <input
-                  type="text"
-                  name="travelTime"
-                  placeholder="3 - 4 hours"
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-
-              {/* Road Condition */}
-              <div>
-                <label className="mb-2 block font-medium">Road Condition</label>
-
-                <select
-                  name="roadCondition"
-                  className="w-full rounded-lg border p-3"
-                >
-                  <option value="">Select Road Condition</option>
-                  <option value="Excellent">Excellent</option>
-                  <option value="Good">Good</option>
-                  <option value="Average">Average</option>
-                  <option value="Under Construction">Under Construction</option>
-                  <option value="Mixed">Mixed</option>
-                </select>
-              </div>
-
-              {/* Toll */}
-              <div>
-                <label className="mb-2 block font-medium">
-                  Toll Information
-                </label>
-
-                <input
-                  type="text"
-                  name="tollInfo"
-                  placeholder="Approx. ₹150 - ₹250"
-                  className="w-full rounded-lg border p-3"
-                />
-              </div>
-
-              {/* Route Type */}
-              <div>
-                <label className="mb-2 block font-medium">Route Type</label>
-
-                <select
-                  name="routeType"
-                  className="w-full rounded-lg border p-3"
-                >
-                  <option value="">Select Route Type</option>
-                  <option value="Highway">Highway</option>
-                  <option value="Expressway">Expressway</option>
-                  <option value="State Highway">State Highway</option>
-                  <option value="Mixed">Mixed</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Popular Places  */}
-          <div className="mt-8 rounded-lg border bg-stone-50 p-5">
-            <h3 className="mb-5 text-lg font-semibold">Popular Places</h3>
-
-            <textarea
-              rows={4}
-              name="popularStops"
-              placeholder="Barabanki, Dewa Sharif, Faizabad..."
+            <input
+              type="text"
+              name="fromCity"
+              value={formData.fromCity}
+              onChange={handleChange}
+              placeholder="Lucknow"
               className="w-full rounded-lg border p-3"
             />
           </div>
 
-          {/* Hotels */}
-          <div className="mt-8 rounded-lg border bg-stone-50 p-5">
-            <h3 className="mb-5 text-lg font-semibold">Hotels</h3>
+          <div>
+            <label className="mb-2 block font-medium">To City</label>
 
-            <textarea
-              rows={4}
-              name="hotels"
-              placeholder="List hotels or accommodation options available along the route..."
+            <input
+              type="text"
+              name="toCity"
+              value={formData.toCity}
+              onChange={handleChange}
+              placeholder="Ayodhya"
               className="w-full rounded-lg border p-3"
             />
           </div>
 
-          {/* Restaurants */}
-          <div className="mt-8 rounded-lg border bg-stone-50 p-5">
-            <h3 className="mb-5 text-lg font-semibold">Restaurants</h3>
+          <div>
+            <label className="mb-2 block font-medium">Distance</label>
 
-            <textarea
-              rows={4}
-              name="restaurants"
-              placeholder="Popular restaurants, dhabas and food stops along the route..."
+            <input
+              type="text"
+              name="distance"
+              value={formData.distance}
+              onChange={handleChange}
+              placeholder="135 km"
               className="w-full rounded-lg border p-3"
             />
           </div>
 
-          {/* Save */}
-          <div className="mt-6 flex justify-end">
-            <button
-              type="button"
-              className="rounded-lg bg-gold px-6 py-3 font-semibold text-white"
-            >
-              Save Route Information
-            </button>
-          </div>
-        </div>
+          <div>
+            <label className="mb-2 block font-medium">Travel Time</label>
 
-        {/* Route Details */}
-        <div className="mt-8 rounded-lg border bg-stone-50 p-5">
-          {/* Header */}
-          <div className="mb-6 flex items-center justify-between">
-            <h3 className="text-xl font-semibold">Route Details</h3>
-
-            <button
-              type="button"
-              
-              onClick={addRoute}
-              className="rounded-lg bg-gold px-5 py-2 font-semibold text-black border-black border-2 hover:opacity-90"
-            >
-              + Add Route
-            </button>
+            <input
+              type="text"
+              name="travelTime"
+              value={formData.travelTime}
+              onChange={handleChange}
+              placeholder="3-4 hours"
+              className="w-full rounded-lg border p-3"
+            />
           </div>
 
-          {routes.map((route, index) => (
-            <div
-              key={index}
-              className="mb-8 rounded-lg border bg-white p-5 shadow-sm"
-            >
-              {/* Route Header */}
-              <div className="mb-5 flex items-center justify-between">
-                <h4 className="text-lg font-semibold">Route {index + 1}</h4>
+          <div className="md:col-span-2">
+            <label className="mb-2 block font-medium">Route Condition</label>
 
-                {routes.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeRoute(index)}
-                    className="rounded-lg bg-red-500 px-4 py-2 text-white hover:bg-red-600"
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
+            <textarea
+              rows={3}
+              name="routeCondition"
+              value={formData.routeCondition}
+              onChange={handleChange}
+              placeholder="Describe road and route condition..."
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
 
-              <div className="grid gap-5 md:grid-cols-2">
-                {/* From City */}
-                <div>
-                  <label className="mb-2 block font-medium">From City</label>
+          <div>
+            <label className="mb-2 block font-medium">Popular Places</label>
 
-                  <select
-                    value={route.fromCity}
-                    onChange={(e) =>
-                      handleRouteChange(index, "fromCity", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  >
-                    <option value="">Select From City</option>
-                    <option>Lucknow</option>
-                    <option>Varanasi</option>
-                    <option>Kanpur</option>
-                  </select>
-                </div>
+            <input
+              type="text"
+              value={formData.popularPlaces.join(",")}
+              onChange={(e) =>
+                handleArrayChange("popularPlaces", e.target.value)
+              }
+              placeholder="Ayodhya Dham, Ram Mandir"
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
 
-                {/* To City */}
-                <div>
-                  <label className="mb-2 block font-medium">To City</label>
+          <div>
+            <label className="mb-2 block font-medium">Hotels</label>
 
-                  <select
-                    value={route.toCity}
-                    onChange={(e) =>
-                      handleRouteChange(index, "toCity", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  >
-                    <option value="">Select Destination</option>
-                    <option>Ayodhya</option>
-                    <option>Prayagraj</option>
-                    <option>Agra</option>
-                    <option>Gorakhpur</option>
-                  </select>
-                </div>
+            <input
+              type="text"
+              value={formData.hotels.join(",")}
+              onChange={(e) => handleArrayChange("hotels", e.target.value)}
+              placeholder="Hotel 1, Hotel 2"
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
 
-                {/* Starting Fare */}
-                <div>
-                  <label className="mb-2 block font-medium">
-                    Starting Fare
-                  </label>
+          <div>
+            <label className="mb-2 block font-medium">Restaurants</label>
 
-                  <input
-                    type="number"
-                    value={route.startingFare}
-                    onChange={(e) =>
-                      handleRouteChange(index, "startingFare", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-
-                {/* Slug */}
-                <div>
-                  <label className="mb-2 block font-medium">Route Slug</label>
-
-                  <input
-                    type="text"
-                    value={route.slug}
-                    onChange={(e) =>
-                      handleRouteChange(index, "slug", e.target.value)
-                    }
-                    className="w-full rounded-lg border p-3"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+            <input
+              type="text"
+              value={formData.restaurants.join(",")}
+              onChange={(e) => handleArrayChange("restaurants", e.target.value)}
+              placeholder="Restaurant 1, Restaurant 2"
+              className="w-full rounded-lg border p-3"
+            />
+          </div>
         </div>
       </div>
 
-      {/* SEO SECTION */}
+      {/* =====================================================
+          OUTSTATION ROUTES
+      ===================================================== */}
+
       <div className="rounded-xl border bg-white p-6 shadow-sm">
-        <h2 className="mb-6 border-b pb-3 text-2xl font-bold">
-          SEO Information
-        </h2>
+        <div className="mb-6 flex items-center justify-between border-b pb-3">
+          <h2 className="text-2xl font-bold">Popular Outstation Routes</h2>
+
+          <button
+            type="button"
+            onClick={addRoute}
+            className="rounded-lg bg-gold px-5 py-2 font-semibold text-black"
+          >
+            + Add Route
+          </button>
+        </div>
 
         <div className="space-y-5">
-          {/* Meta Title */}
           <div>
-            <label className="mb-2 block font-medium">Meta Title</label>
+            <label className="mb-2 block font-medium">Section Heading</label>
 
             <input
               type="text"
-              name="metaTitle"
-              placeholder="Lucknow to Ayodhya Taxi Service"
+              name="routeHeading"
+              value={formData.routeHeading}
+              onChange={handleChange}
+              placeholder="Outstation Cab from Lucknow"
               className="w-full rounded-lg border p-3"
             />
           </div>
 
-          {/* Meta Description */}
-          <div>
-            <label className="mb-2 block font-medium">Meta Description</label>
-
-            <textarea
-              rows={4}
-              name="metaDescription"
-              placeholder="Book Lucknow to Ayodhya taxi with professional drivers at affordable fares."
-              className="w-full rounded-lg border p-3"
-            />
-          </div>
-
-          {/* Meta Keywords */}
-          <div>
-            <label className="mb-2 block font-medium">Meta Keywords</label>
-
-            <input
-              type="text"
-              name="metaKeywords"
-              placeholder="Lucknow Taxi, Ayodhya Cab, Outstation Taxi"
-              className="w-full rounded-lg border p-3"
-            />
-
-            <p className="mt-1 text-sm text-gray-500">
-              Separate keywords with commas.
-            </p>
-          </div>
-
-          {/* Canonical URL */}
-          <div>
-            <label className="mb-2 block font-medium">Canonical URL</label>
-
-            <input
-              type="text"
-              name="canonicalUrl"
-              placeholder="https://example.com/taxi/lucknow-to-ayodhya"
-              className="w-full rounded-lg border p-3"
-            />
-          </div>
-
-          {/* OG Image */}
           <div>
             <label className="mb-2 block font-medium">
-              Social Share Image (OG Image)
+              Section Description
             </label>
 
-            <input
-              type="file"
-              accept="image/*"
-              name="ogImage"
+            <textarea
+              rows={3}
+              name="routeDescription"
+              value={formData.routeDescription}
+              onChange={handleChange}
+              placeholder="Book reliable outstation cabs..."
               className="w-full rounded-lg border p-3"
             />
           </div>
-
-          {/* Robots */}
-          <div>
-            <label className="mb-2 block font-medium">Robots</label>
-
-            <select name="robots" className="w-full rounded-lg border p-3">
-              <option value="index,follow">Index, Follow</option>
-              <option value="noindex,nofollow">No Index, No Follow</option>
-            </select>
-          </div>
         </div>
+
+        {formData.routes.map((route, index) => (
+          <div key={index} className="mt-8 rounded-lg border bg-stone-50 p-5">
+            <div className="mb-5 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Route {index + 1}</h3>
+
+              <button
+                type="button"
+                onClick={() => removeRoute(index)}
+                className="rounded-lg bg-red-500 px-4 py-2 text-white"
+              >
+                Remove
+              </button>
+            </div>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <div>
+                <label className="mb-2 block font-medium">From City</label>
+
+                <input
+                  type="text"
+                  value={route.fromCity}
+                  onChange={(e) =>
+                    handleRouteChange(index, "fromCity", e.target.value)
+                  }
+                  placeholder="Lucknow"
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-medium">To City</label>
+
+                <input
+                  type="text"
+                  value={route.toCity}
+                  onChange={(e) =>
+                    handleRouteChange(index, "toCity", e.target.value)
+                  }
+                  placeholder="Ayodhya"
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-medium">Starting Fare</label>
+
+                <input
+                  type="number"
+                  value={route.startingFare}
+                  onChange={(e) =>
+                    handleRouteChange(index, "startingFare", e.target.value)
+                  }
+                  placeholder="2500"
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-medium">Route Slug</label>
+
+                <input
+                  type="text"
+                  value={route.slug}
+                  onChange={(e) =>
+                    handleRouteChange(index, "slug", e.target.value)
+                  }
+                  placeholder="lucknow-to-ayodhya-cab"
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-medium">Display Order</label>
+
+                <input
+                  type="number"
+                  value={route.displayOrder}
+                  onChange={(e) =>
+                    handleRouteChange(
+                      index,
+                      "displayOrder",
+                      Number(e.target.value),
+                    )
+                  }
+                  className="w-full rounded-lg border p-3"
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-medium">Status</label>
+
+                <select
+                  value={route.status ? "true" : "false"}
+                  onChange={(e) =>
+                    handleRouteChange(
+                      index,
+                      "status",
+                      e.target.value === "true",
+                    )
+                  }
+                  className="w-full rounded-lg border p-3"
+                >
+                  <option value="true">Active</option>
+                  <option value="false">Inactive</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
-      <button
-        onClick={handleSubmit}
-        className="rounded-lg bg-blue-600 px-8 py-3 font-semibold text-white hover:bg-blue-700"
-      >
-        Save Cab Hub Template
-      </button>
-    </div>
+      {/* =====================================================
+          FINAL SUBMIT
+      ===================================================== */}
+
+      <div className="flex justify-end gap-4 pb-10">
+        {/* <button
+          type="button"
+          onClick={() => console.log(formData)}
+          className="rounded-lg border border-gray-300 bg-white px-6 py-3 font-semibold text-black hover:bg-gray-100"
+        >
+          Preview Data
+        </button> */}
+
+        <button
+          type="submit"
+          className="rounded-lg bg-gold px-8 py-3 font-semibold text-black border-2 border-black hover:opacity-90"
+        >
+          Save Cab Hub
+        </button>
+      </div>
+    </form>
   );
 }
