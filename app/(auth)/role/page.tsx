@@ -1,17 +1,23 @@
 "use client";
+import CityDropdown from "@/components/CityDropdown";
 import RoleTable from "@/components/tables/RoleTable";
 import { Context } from "@/contextApi/AuthContext";
 import { contextType } from "@/contextApi/CreateDataContext";
 import { Megaphone, User, Users } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 const page = () => {
   const { state, boundActions } = useContext<contextType>(Context);
   const { updateUserData } = boundActions;
   const pathName = usePathname();
   const router = useRouter();
+  const [city, setCity] = useState<any>(null);
 
+  const [form, setForm] = useState({
+    name: "",
+    address: "",
+  });
   useEffect(() => {
     if (!state?.userData?._id) {
       updateUserData({ router, pathName });
@@ -25,9 +31,15 @@ const page = () => {
           <Users className="w-5 h-5 text-white" />
         </div>
         <h1 className="text-xl font-semibold text-gray-900 m-0 p-0">Role</h1>
+          <CityDropdown
+        value={city}
+        onChange={setCity}
+      />
       </div>
 
+
       <RoleTable />
+      
     </>
   );
 };
