@@ -486,12 +486,20 @@ export default function CabHubTemplateForm() {
   //   });
   // };
 
-  const convertCsvRow = (row: any) => {
-    return {
-      cityName: row.cityName || "",
-      startingFare: row.startingFare || "",
+  const convertCsvRow = (row: any, index: number) => {
+    if (!row.cityName?.trim()) {
+      throw new Error(`Row ${index + 2}: City Name is required.`);
+    }
 
-      overview: row.overview || "",
+    if (!row.startingFare?.trim()) {
+      throw new Error(`Row ${index + 2}: Starting Fare is required.`);
+    }
+
+    return {
+      cityName: row.cityName.trim(),
+      startingFare: row.startingFare.trim(),
+
+      overview: row.overview?.trim() || "",
 
       famousFor: row.famousFor
         ? row.famousFor
@@ -507,7 +515,7 @@ export default function CabHubTemplateForm() {
             .filter(Boolean)
         : [],
 
-      bestToVisit: row.bestToVisit || "",
+      bestToVisit: row.bestToVisit?.trim() || "",
 
       idealFor: row.idealFor
         ? row.idealFor
@@ -516,8 +524,8 @@ export default function CabHubTemplateForm() {
             .filter(Boolean)
         : [],
 
-      nearestAirport: row.nearestAirport || "",
-      nearestRailway: row.nearestRailway || "",
+      nearestAirport: row.nearestAirport?.trim() || "",
+      nearestRailway: row.nearestRailway?.trim() || "",
 
       popularPlaces: row.popularPlaces
         ? row.popularPlaces
@@ -540,18 +548,18 @@ export default function CabHubTemplateForm() {
             .filter(Boolean)
         : [],
 
-      fareHeading: row.fareHeading || "",
+      fareHeading: row.fareHeading?.trim() || "",
 
       seo: {
-        metaTitle: row.metaTitle || "",
-        metaDescription: row.metaDescription || "",
+        metaTitle: row.metaTitle?.trim() || "",
+        metaDescription: row.metaDescription?.trim() || "",
         metaKeywords: row.metaKeywords
           ? row.metaKeywords
               .split(",")
               .map((item: string) => item.trim())
               .filter(Boolean)
           : [],
-        canonicalUrl: row.canonicalUrl || "",
+        canonicalUrl: row.canonicalUrl?.trim() || "",
       },
 
       fareDetails: row.fareDetails ? JSON.parse(row.fareDetails) : [],
@@ -636,7 +644,12 @@ export default function CabHubTemplateForm() {
 
     const uploadPages = async (rows: any[]) => {
       try {
-        const pages = rows.map(convertCsvRow);
+        if (!rows.length) {
+          toast.error("The uploaded file is empty.");
+          return;
+        }
+
+        const pages = rows.map((row, index) => convertCsvRow(row, index));
 
         console.log("BULK DATA:", pages);
 
@@ -651,7 +664,8 @@ export default function CabHubTemplateForm() {
         );
 
         if (response.data.success) {
-          toast.success(response.data.message);
+          toast.success(response.data.message || "Bulk upload successful.");
+
           setCsvFile(null);
 
           if (fileInputRef.current) {
@@ -661,7 +675,9 @@ export default function CabHubTemplateForm() {
       } catch (error: unknown) {
         console.error(error);
 
-        if (axios.isAxiosError(error)) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        } else if (axios.isAxiosError(error)) {
           toast.error(error.response?.data?.message || "Bulk upload failed.");
         } else {
           toast.error("Bulk upload failed.");
@@ -676,6 +692,7 @@ export default function CabHubTemplateForm() {
 
         complete: async (results) => {
           const rows = results.data as any[];
+
           await uploadPages(rows);
         },
 
@@ -704,6 +721,11 @@ export default function CabHubTemplateForm() {
             type: "array",
           });
 
+          if (!workbook.SheetNames.length) {
+            toast.error("Excel file contains no sheets.");
+            return;
+          }
+
           const sheetName = workbook.SheetNames[0];
           const worksheet = workbook.Sheets[sheetName];
 
@@ -713,12 +735,18 @@ export default function CabHubTemplateForm() {
         } catch (error: unknown) {
           console.error(error);
 
-          if (axios.isAxiosError(error)) {
+          if (error instanceof Error) {
+            toast.error(error.message);
+          } else if (axios.isAxiosError(error)) {
             toast.error(error.response?.data?.message || "Bulk upload failed.");
           } else {
             toast.error("Bulk upload failed.");
           }
         }
+      };
+
+      reader.onerror = () => {
+        toast.error("Unable to read Excel file.");
       };
 
       reader.readAsArrayBuffer(csvFile);
