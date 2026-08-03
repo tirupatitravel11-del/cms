@@ -32,7 +32,7 @@ export default function CityDropdown({
 search:keyword
         }
       );
-
+console.log("sdf")
       setOptions(res.data.data || []);
     } catch (error) {
       console.log(error);
