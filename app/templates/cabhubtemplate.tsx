@@ -826,7 +826,7 @@ export default function CabHubTemplateForm() {
           type="button"
           onClick={handleCsvUpload}
           disabled={!csvFile}
-          className="mt-4 rounded-lg bg-gold px-5 py-2 font-semibold text-black border-2 border-black transition disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-4 rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white border-2  transition"
         >
           Upload File
         </button>
@@ -1132,7 +1132,7 @@ export default function CabHubTemplateForm() {
           <button
             type="button"
             onClick={addFare}
-            className="flex rounded-lg bg-gold px-5 py-2 font-semibold text-black justify-self-end"
+            className="flex rounded-lg mt-2 bg-blue-600 text-white px-5 py-2 font-semibold  justify-self-end"
           >
             + Add Fare
           </button>
@@ -1381,7 +1381,7 @@ export default function CabHubTemplateForm() {
           <button
             type="button"
             onClick={addFaq}
-            className="flex rounded-lg bg-gold px-5 py-2 font-semibold text-black justify-self-end"
+            className="flex rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white justify-self-end"
           >
             + Add FAQ
           </button>
@@ -1657,7 +1657,7 @@ export default function CabHubTemplateForm() {
           <button
             type="button"
             onClick={addRoute}
-            className="flex rounded-lg bg-gold px-5 py-2 font-semibold text-black justify-self-end"
+            className="flex rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white justify-self-end"
           >
             + Add Route
           </button>
@@ -1678,7 +1678,7 @@ export default function CabHubTemplateForm() {
 
           <button
             type="submit"
-            className="rounded-lg bg-gold px-8 py-3 font-semibold text-black border-2 border-black hover:opacity-90
+            className="rounded-lg bg-blue-600 px-8 py-3 font-semibold text-white border-2  hover:opacity-90
             disabled:cursor-not-allowed disabled:opacity-50"
             disabled={loading || uploading}
           >
