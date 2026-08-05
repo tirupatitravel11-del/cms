@@ -1,13 +1,15 @@
 "use client";
 
 import CityDropdown from "@/components/CityDropdown";
+import { compressAndConvertToBase64 } from "@/util/utility";
 import axios from "axios";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 
 interface Room {
   roomName: string;
   price: number;
+  image: string;
 }
 
 export default function HotelForm() {
@@ -18,7 +20,7 @@ export default function HotelForm() {
     description: "",
     categories: "",
     amenities: "",
-    images: "",
+    images: [] as string[],
     starRating: "",
     priceFrom: "",
     priceTo: "",
@@ -42,6 +44,9 @@ export default function HotelForm() {
     id: "",
     cityName: "",
   });
+  const [roomImage, setRoomImage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const roomImageInputRef = useRef<HTMLInputElement>(null);
   const handleCityChange = (selectedCity: any) => {
     setCity(selectedCity);
 
@@ -70,7 +75,7 @@ export default function HotelForm() {
     description: "",
     categories: "",
     amenities: "",
-    images: "",
+    images: [],
     starRating: "",
     priceFrom: "",
     priceTo: "",
@@ -83,7 +88,7 @@ export default function HotelForm() {
   });
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    // console.log(formData, "llllll");
     try {
       setLoading(true);
       const response = await axios.post(
@@ -108,6 +113,15 @@ export default function HotelForm() {
 
         // Close rooms section
         setShowRooms(false);
+        setCity(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        setRoomImage("");
+
+        if (roomImageInputRef.current) {
+          roomImageInputRef.current.value = "";
+        }
       }
     } catch (error: unknown) {
       console.error(error);
@@ -148,24 +162,28 @@ export default function HotelForm() {
       return;
     }
 
-    if (!roomPrice || isNaN(price) || price <= 0) {
-      toast.error("Please enter valid room price");
+    if (!roomImage) {
+      toast.error("Please select room image");
       return;
     }
 
     const newRoom: Room = {
       roomName: name,
-      price: price,
+      price,
+      image: roomImage,
     };
 
     setFormData((prev) => ({
       ...prev,
-      rooms: [...(prev.rooms || []), newRoom],
+      rooms: [...prev.rooms, newRoom],
     }));
 
-    // Clear inputs
     setRoomName("");
     setRoomPrice("");
+    setRoomImage("");
+    if (roomImageInputRef.current) {
+      roomImageInputRef.current.value = "";
+    }
   };
   const removeRoom = (index: number) => {
     setFormData((prev) => ({
@@ -203,6 +221,32 @@ export default function HotelForm() {
     "Power Backup",
     "Elevator",
   ];
+  const handleRoomImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.length) return;
+
+    const base64 = await compressAndConvertToBase64(e.target.files[0]);
+
+    setRoomImage(base64);
+  };
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    try {
+      const files = Array.from(e.target.files);
+
+      const base64Images = await Promise.all(
+        files.map((file) => compressAndConvertToBase64(file)),
+      );
+
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, ...base64Images],
+      }));
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to process images.");
+    }
+  };
   return (
     <div className="rounded-xl bg-white p-6 shadow text-black">
       <h2 className="mb-6 text-2xl font-bold text-stone-900">Add Hotel</h2>
@@ -355,6 +399,18 @@ export default function HotelForm() {
                       className="w-full rounded-lg border border-stone-300 px-4 py-3 text-stone-900 outline-none placeholder:text-black focus:border-blue-500"
                     />
                   </div>
+                  <div>
+                    <label className="mb-2 block text-sm font-semibold text-stone-800">
+                      room image
+                    </label>
+
+                    <input
+                      ref={roomImageInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleRoomImage}
+                    />
+                  </div>
 
                   {/* ADD BUTTON */}
                   <div className="flex items-end">
@@ -373,25 +429,27 @@ export default function HotelForm() {
                   <div className="mt-4 space-y-3">
                     {formData.rooms.map((room, index) => (
                       <div
-                        key={`${room.roomName}-${index}`}
-                        className="flex items-center justify-between rounded-lg border border-stone-200 bg-white p-4"
+                        key={index}
+                        className="relative flex items-center gap-4 rounded-lg border p-3"
                       >
-                        <div>
-                          <p className="font-semibold text-stone-900">
-                            {room.roomName}
-                          </p>
+                        <img
+                          src={room.image}
+                          alt={room.roomName}
+                          className="h-24 w-24 rounded object-cover border"
+                        />
 
-                          <p className="text-sm text-stone-500">
-                            ₹{room.price.toLocaleString()} / night
-                          </p>
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{room.roomName}</h4>
+
+                          <p className="text-gray-600">₹{room.price}</p>
                         </div>
 
                         <button
                           type="button"
                           onClick={() => removeRoom(index)}
-                          className="rounded-md px-3 py-1 text-sm font-medium text-red-600 hover:bg-red-50"
+                          className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-white hover:bg-red-700"
                         >
-                          Remove
+                          ✕
                         </button>
                       </div>
                     ))}
@@ -500,7 +558,7 @@ export default function HotelForm() {
             <label className="mt-2 mb-2 block font-medium text-stone-700">
               Images
             </label>
-
+            {/* 
             <input
               type="text"
               name="images"
@@ -508,7 +566,39 @@ export default function HotelForm() {
               onChange={handleChange}
               placeholder="Enter image URLs separated by comma"
               className="w-full rounded-lg border border-stone-300 px-4 py-3 outline-none focus:border-blue-500"
+            /> */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full rounded-lg border border-stone-300 px-4 py-3 outline-none focus:border-blue-500"
             />
+            <div className="grid grid-cols-4 gap-3 mt-3">
+              {formData.images.map((image, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={image}
+                    alt={`Hotel ${index}`}
+                    className="h-28 w-full rounded border object-cover"
+                  />
+
+                  <button
+                    type="button"
+                    className="absolute right-1 top-1 rounded bg-red-600 px-2 py-1 text-xs text-white"
+                    onClick={() => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        images: prev.images.filter((_, i) => i !== index),
+                      }));
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {/* STAR RATING */}
