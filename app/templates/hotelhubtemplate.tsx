@@ -256,7 +256,7 @@ export default function HotelForm() {
 
           {/* NAME */}
           <div>
-            <label className="mb-2 block font-medium text-stone-700">
+            <label className="mt-2 mb-2 block font-medium text-stone-700">
               Hotel Name
             </label>
 
@@ -272,7 +272,7 @@ export default function HotelForm() {
 
           {/* ADDRESS */}
           <div className="md:col-span-2">
-            <label className="mb-2 block font-medium text-stone-700">
+            <label className="mt-2 mb-2 block font-medium text-stone-700">
               Address
             </label>
 
@@ -287,7 +287,7 @@ export default function HotelForm() {
           </div>
 
           {/* DESCRIPTION */}
-          <div className="md:col-span-2">
+          <div className="mt-2 md:col-span-2">
             <label className="mb-2 block font-medium text-stone-700">
               Description
             </label>
@@ -402,7 +402,7 @@ export default function HotelForm() {
           </div>
           {/* CATEGORIES */}
           <div>
-            <label className="mb-2 block font-medium text-stone-700">
+            <label className="mt-2 mb-2 block font-medium text-stone-700">
               Categories
             </label>
 
@@ -497,7 +497,7 @@ export default function HotelForm() {
           </div>
           {/* IMAGES */}
           <div className="md:col-span-2">
-            <label className="mb-2 block font-medium text-stone-700">
+            <label className="mt-2 mb-2 block font-medium text-stone-700">
               Images
             </label>
 
@@ -513,7 +513,7 @@ export default function HotelForm() {
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {/* STAR RATING */}
             <div>
-              <label className="mb-2 block font-medium text-stone-700">
+              <label className="mt-2 mb-2 block font-medium text-stone-700">
                 Star Rating
               </label>
 
@@ -531,7 +531,7 @@ export default function HotelForm() {
 
             {/* PRIORITY */}
             <div>
-              <label className="mb-2 block font-medium text-stone-700">
+              <label className="mt-2 mb-2 block font-medium text-stone-700">
                 Priority
               </label>
 
