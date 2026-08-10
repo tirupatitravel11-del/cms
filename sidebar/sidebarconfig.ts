@@ -32,6 +32,7 @@ import {
   Road,
   Banknote,
   Hotel,
+  Package,
 } from "lucide-react";
 
 export interface SidebarItemType {
@@ -78,6 +79,7 @@ export const sidebarConfig: SidebarItemType[] = [
   // { label: "RouteFare", path: "/routefare", permission: "", icon: Banknote },
   { label: "CabHub", path: "/cabhub", permission: "", icon: CarTaxiFront },
   { label: "HotelHub", path: "/hotelhub", permission: "", icon: Hotel },
+  { label: "PackageHub", path: "/packagehub", permission: "", icon: Package },
 
   {
     label: "Role & Permission",
