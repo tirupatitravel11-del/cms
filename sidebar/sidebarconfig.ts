@@ -52,12 +52,6 @@ export const sidebarConfig: SidebarItemType[] = [
     icon: LayoutDashboard,
   },
 
-  // {
-  //   label: "Leads", path: "/leads", permission: "manage_leads", icon: Settings, role: ["admin"]
-
-  // },
-
-  // { label: "Blog", path: "/blog", permission: "blog", icon: Rss, role: ["admin"] },
   {
     label: "Change Password",
     path: "/changepassword",
@@ -71,12 +65,12 @@ export const sidebarConfig: SidebarItemType[] = [
   //   icon: PersonOutlined,
   //   role: ["admin", "counselor", "teacher", "student"],
   // },
-  // { label: "Vehicle Type", path: "/vehicletype", permission: "", icon: Car },
-  // { label: "States", path: "/states", permission: "", icon: Building2 },
-  // { label: "Cities", path: "/city", permission: "", icon: Building2 },
-  // { label: "Vehicle", path: "/vehicle", permission: "", icon: CarTaxiFront },
-  // { label: "Route", path: "/route", permission: "", icon: Road },
-  // { label: "RouteFare", path: "/routefare", permission: "", icon: Banknote },
+  { label: "Vehicle Type", path: "/vehicletype", permission: "", icon: Car },
+  { label: "States", path: "/states", permission: "", icon: Building2 },
+  { label: "Cities", path: "/city", permission: "", icon: Building2 },
+  { label: "Vehicle", path: "/vehicle", permission: "", icon: CarTaxiFront },
+  { label: "Route", path: "/route", permission: "", icon: Road },
+  { label: "RouteFare", path: "/routefare", permission: "", icon: Banknote },
   { label: "CabHub", path: "/cabhub", permission: "", icon: CarTaxiFront },
   { label: "HotelHub", path: "/hotelhub", permission: "", icon: Hotel },
   { label: "PackageHub", path: "/packagehub", permission: "", icon: Package },
