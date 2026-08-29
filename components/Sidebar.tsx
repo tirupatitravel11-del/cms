@@ -224,7 +224,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             className="flex items-center gap-2 cursor-pointer"
           >
             <GraduationCap className="w-8 h-8 text-blue-500" />
-            <span className="text-2xl font-bold text-blue-500">Cyberous</span>
+            <span className="text-2xl font-bold text-blue-500">Tirupati travels</span>
           </div>
         )}
         {isCollapsed && (

@@ -1,5 +1,5 @@
 "use client";
-import { AuthRoutes } from "@/route_config/config";
+// import { AuthRoutes } from "@/route_config/config";
 import createDataContext from "./CreateDataContext";
 
 import axios from "axios";
@@ -7,14 +7,14 @@ import { io, Socket } from "socket.io-client";
 import { DateTime } from "luxon";
 // import { toast } from "react-toastify";
 // import "react-toastify/dist/ReactToastify.css";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 import path from "path";
 import { act } from "react";
 export type notificationType = {
   // body_template_id: { content: string };
   // content:string,
-  receiver_name: string
+  receiver_name: string;
   created_at: string;
   // data: [];
   seen: boolean;
@@ -28,13 +28,11 @@ export type notificationType = {
   body: string;
 };
 export type permissionType = {
-  _id: string,
-  label: string,
-  created_at: string,
-  updated_at: string
-}
-
-
+  _id: string;
+  label: string;
+  created_at: string;
+  updated_at: string;
+};
 
 axios.defaults.withCredentials = true;
 // Reducers
@@ -57,14 +55,14 @@ export type stateType = {
     updated_at: string;
     updated_by: string;
     user_type_id: number;
-    empNo:string,
+    empNo: string;
     roleId: {
-      created_at: string,
-      name: string,
-      permissions: permissionType[],
-      updated_at: string,
-      _id: string
-    }
+      created_at: string;
+      name: string;
+      permissions: permissionType[];
+      updated_at: string;
+      _id: string;
+    };
     token: string;
   };
   userProfile: {
@@ -86,17 +84,17 @@ export type stateType = {
     experience: string;
     familyOccupation: string;
     fatherName: string;
-    isDeleted: false,
+    isDeleted: false;
     landmark: string;
     motherName: string;
     registrationNo: string;
     religion: string;
-    salary: 0,
+    salary: 0;
     state: string;
     updated_at: string;
     updated_by: string;
     userId: string;
-    zipCode: string
+    zipCode: string;
   };
   getUserDetails: {};
   userToken: string | null;
@@ -211,7 +209,7 @@ export type stateType = {
   loadingContent: boolean;
   loadingNotificationData: boolean;
   urlData: any;
-  noticeCount:number
+  noticeCount: number;
 };
 type actionType = {
   type: string;
@@ -221,10 +219,10 @@ type actionType = {
 
 export type authReducerType = (
   state: stateType,
-  action: actionType
+  action: actionType,
 ) => stateType;
 export type actionFunctionType = (
-  dispatch: React.Dispatch<actionType>
+  dispatch: React.Dispatch<actionType>,
 ) => (fn: any) => Promise<void>;
 export type boundAction = (fn: any) => Promise<void>;
 export type contextActionType = {
@@ -300,49 +298,47 @@ export type boundActionType = {
   setEditedAvatarId: boundAction;
   onRefreshAvatarList: boundAction;
   setUrlData: boundAction;
-  getNoticeCount:boundAction;
+  getNoticeCount: boundAction;
 
   [key: string]: boundAction;
 };
 export const initialBoundActions = {
-  signIn: async () => { },
-  signInWithGoogle: async () => { },
-  signInWithFacebook: async () => { },
-  signOut: async () => { },
-  updateUserData: async () => { },
-  updateUserProfile: async () => { },
-  fetchUpdatedProfileData: async () => { },
-  setSignInStatus: async () => { },
-  setLoadingStatus: async () => { },
-  getNotifications: async () => { },
-  setNotificationSeen: async () => { },
-  setNotificationVisited: async () => { },
-  getChats: async () => { },
+  signIn: async () => {},
+  signInWithGoogle: async () => {},
+  signInWithFacebook: async () => {},
+  signOut: async () => {},
+  updateUserData: async () => {},
+  updateUserProfile: async () => {},
+  fetchUpdatedProfileData: async () => {},
+  setSignInStatus: async () => {},
+  setLoadingStatus: async () => {},
+  getNotifications: async () => {},
+  setNotificationSeen: async () => {},
+  setNotificationVisited: async () => {},
+  getChats: async () => {},
   // modifyNotification:actionFunctionType,
-  getUnseenMessages: async () => { },
-  verifyCode: async () => { },
+  getUnseenMessages: async () => {},
+  verifyCode: async () => {},
   // setNotificationBadgeCount :async()=>{},
-  toggleSideBar: async () => { },
-  setStagingSubscription: async () => { },
-  toggleSideSubMenu: async () => { },
-  updateUserActivity: async () => { },
-  setSocket: async () => { },
-  getUserSubscriptionData: async () => { },
-  setNotificationPerm: async () => { },
-  setNotificationData: async () => { },
-  setNotificationCount: async () => { },
-  setNotificationBadgeCount: async () => { },
-  setNotificationMessage: async () => { },
-  setEditedAvatarId: async () => { },
-  onRefreshAvatarList: async () => { },
-  setUrlData: async () => { },
-  getNoticeCount:async()=>{}
-
-
+  toggleSideBar: async () => {},
+  setStagingSubscription: async () => {},
+  toggleSideSubMenu: async () => {},
+  updateUserActivity: async () => {},
+  setSocket: async () => {},
+  getUserSubscriptionData: async () => {},
+  setNotificationPerm: async () => {},
+  setNotificationData: async () => {},
+  setNotificationCount: async () => {},
+  setNotificationBadgeCount: async () => {},
+  setNotificationMessage: async () => {},
+  setEditedAvatarId: async () => {},
+  onRefreshAvatarList: async () => {},
+  setUrlData: async () => {},
+  getNoticeCount: async () => {},
 };
 const AuthReducer: authReducerType = (
   state: stateType,
-  action: actionType
+  action: actionType,
 ): stateType => {
   if (action.type === "SIGN_IN") {
     return {
@@ -374,15 +370,15 @@ const AuthReducer: authReducerType = (
         updated_at: "",
         updated_by: "",
         user_type_id: 0,
-        empNo:"",
+        empNo: "",
         roleId: {
           created_at: "",
           name: "",
           permissions: [],
           updated_at: "",
-          _id: ""
+          _id: "",
         },
-        token: ""
+        token: "",
       },
       userProfile: {
         dob: "",
@@ -413,7 +409,7 @@ const AuthReducer: authReducerType = (
         updated_at: "",
         updated_by: "",
         userId: "",
-        zipCode: ""
+        zipCode: "",
       },
       getUserDetails: [],
       isSignout: true,
@@ -492,7 +488,7 @@ const AuthReducer: authReducerType = (
       loadingContent: false,
       loadingNotificationData: false,
       urlData: null,
-      noticeCount:0
+      noticeCount: 0,
     };
   } else if (action.type === "USER_DATA") {
     return {
@@ -503,10 +499,9 @@ const AuthReducer: authReducerType = (
   } else if (action.type === "UPDATE_TOKEN") {
     return {
       ...state,
-      webToken: action.payload.token
-    }
-  }
-  else if (action.type === "UPDATE_USER_DATA") {
+      webToken: action.payload.token,
+    };
+  } else if (action.type === "UPDATE_USER_DATA") {
     return {
       ...state,
       userData: action.payload,
@@ -698,12 +693,10 @@ const AuthReducer: authReducerType = (
       });
       action.payload.setNotificationData({ user_id: state.userData._id });
     });
-  
 
     return {
       ...state,
       socket: action.payload.socket,
-
     };
   } else if (action.type == "SET_NOTIFICATIONPERM") {
     return {
@@ -728,7 +721,6 @@ const AuthReducer: authReducerType = (
       notificationBadgeCount: action.payload,
     };
   } else if (action.type == "SET_EDITED_AVATAR_ID") {
-
     return {
       ...state,
       editedAvatarId: action.payload,
@@ -758,8 +750,7 @@ const AuthReducer: authReducerType = (
       ...state,
       noticeCount: action.payload,
     };
-  }   
-  else {
+  } else {
     return { ...state };
   }
 };
@@ -836,7 +827,6 @@ const verifyCode: actionFunctionType = (dispatch) => {
 //             navigator?.userAgent?.indexOf(";")
 //           ) || "",
 //       });
-
 
 //       try {
 //         window.localStorage.setItem("token", response.data.userData?.web_token)
@@ -985,28 +975,29 @@ const signIn: actionFunctionType = (dispatch) => {
       setLoading(true);
 
       // Step 1: Sign In
-      const response = await axios.post(`${process.env.apiUrl}/api/admin-login`, {
-        email,
-        password,
-        // selectedrole
-        //   timezone: DateTime.now().zoneName,
-        //   OS:
-        //     navigator?.userAgent?.substring(
-        //       navigator?.userAgent?.indexOf("(") + 1,
-        //       navigator?.userAgent?.indexOf(";")
-        //     ) || "",
-      });
+      const response = await axios.post(
+        `${process.env.apiUrl}/api/admin-login`,
+        {
+          email,
+          password,
+          // selectedrole
+          //   timezone: DateTime.now().zoneName,
+          //   OS:
+          //     navigator?.userAgent?.substring(
+          //       navigator?.userAgent?.indexOf("(") + 1,
+          //       navigator?.userAgent?.indexOf(";")
+          //     ) || "",
+        },
+      );
 
       // console.log(response, "siginresponse")
       const token = response?.data?.token;
       const userId = response.data.userData?._id;
-      toast.success(response?.data?.message)
+      toast.success(response?.data?.message);
 
       try {
         localStorage.setItem("token", token);
-      } catch (error) {
-
-      }
+      } catch (error) {}
 
       // Step 2: Fetch Subscription Data
       // const subRes = await axios.post(
@@ -1018,9 +1009,13 @@ const signIn: actionFunctionType = (dispatch) => {
 
       // Step 3: Fetch User Profile
       // const timezone = DateTime.now().zoneName;
-      const profileRes = await axios.post(`${process.env.apiUrl}/api/get-single-user`, {
-        id: userId,
-      }, { headers: { Authorization: `Bearer ${token}` } });
+      const profileRes = await axios.post(
+        `${process.env.apiUrl}/api/get-single-user`,
+        {
+          id: userId,
+        },
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
       // console.log(profileRes, "profile")
       const profile = profileRes.data?.userprofile;
 
@@ -1041,14 +1036,13 @@ const signIn: actionFunctionType = (dispatch) => {
 
       // setLoading(false);
       // dispatch({ type: "LOADING_CONTENT", payload: false });
-
     } catch (err: any) {
       setLoading(false);
       dispatch({ type: "LOADING_CONTENT", payload: false });
 
       if (err?.response?.data?.message) {
         setError(err.response.data.message);
-        toast.error(err.response.data.message)
+        toast.error(err.response.data.message);
       }
 
       // if (err?.response?.data?.needVerification) {
@@ -1094,7 +1088,7 @@ const signIn: actionFunctionType = (dispatch) => {
 //       // } catch (error) {
 
 //       // }
-//       // const token  
+//       // const token
 //       // const profileRes = await axios.post(
 //       //   `${process.env.apiUrl}/api/get-single-user`,
 //       //   {
@@ -1191,9 +1185,7 @@ const signInWithGoogle: actionFunctionType = (dispatch) => {
           action: response?.data?.message,
           actionUrl: pathName,
         });
-      } catch (error) {
-
-      }
+      } catch (error) {}
       const returnUrl = localStorage.getItem("returnUrl");
       localStorage.removeItem("returnUrl");
       if (returnUrl) {
@@ -1208,7 +1200,6 @@ const signInWithGoogle: actionFunctionType = (dispatch) => {
       // }
       // const data = response.data.result;
       // const token = response.data.token
-
 
       dispatch({ type: "USER_DATA", payload: response.data.userData });
 
@@ -1250,7 +1241,7 @@ const signInWithGoogle: actionFunctionType = (dispatch) => {
 
       try {
         // googleLogout()
-      } catch (error) { }
+      } catch (error) {}
       // setDisable(false)
       // setError(err.response.data.message)
       // setVisibleSnackErr(true)
@@ -1352,8 +1343,6 @@ const signInWithFacebook: actionFunctionType = (dispatch) => {
       // const data = response.data.result;
       // const token = response.data.token
 
-
-
       dispatch({ type: "USER_DATA", payload: response.data.userData });
 
       // if (backHand) {
@@ -1394,7 +1383,7 @@ const signInWithFacebook: actionFunctionType = (dispatch) => {
         // window.FB.logout((res:any)=>{
         //   console.log("facebook logout success");
         // })
-      } catch (error) { }
+      } catch (error) {}
 
       setLoading(false);
       // setDisable(false)
@@ -1411,9 +1400,8 @@ const signInWithFacebook: actionFunctionType = (dispatch) => {
 
       // setRequireEmailVerification(true)
     }
-  }
+  };
 };
-
 
 const fetchUpdatedProfileData: actionFunctionType = (dispatch) => {
   return async ({
@@ -1455,7 +1443,7 @@ const signOut: actionFunctionType = (dispatch) => {
     // signup_method,
     // updateUserActivity,
     pathName,
-    token
+    token,
   }) => {
     try {
       const BG_TASK = "BACKGROUND-NOTIFICATION-TASK";
@@ -1464,15 +1452,13 @@ const signOut: actionFunctionType = (dispatch) => {
       let res = await axios.post(
         process.env.apiUrl + "/api/signout",
         { userId: user_id },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       try {
-        window.localStorage.setItem("token", '')
-      } catch (error) {
-
-      }
-      dispatch({ type: "UPDATE_TOKEN", payload: { token: '' } });
+        window.localStorage.setItem("token", "");
+      } catch (error) {}
+      dispatch({ type: "UPDATE_TOKEN", payload: { token: "" } });
       // try {
       //   updateUserActivity({
       //     user_id: res?.data?.userData?._id,
@@ -1482,7 +1468,7 @@ const signOut: actionFunctionType = (dispatch) => {
       // } catch (error) {
       //   console.log(error, "");
       // }
-      dispatch({ type: "CLEAR_SOCKET", payload: {} })
+      dispatch({ type: "CLEAR_SOCKET", payload: {} });
       dispatch({ type: "SIGN_OUT", payload: {} });
       router.push("/");
       // if (signup_method == 58) {
@@ -1495,8 +1481,6 @@ const signOut: actionFunctionType = (dispatch) => {
       //   console.log("facebook logout success");
       // })
       // }
-
-
 
       // await AsyncStorage.setItem("user_id", "");
       // await AsyncStorage.removeItem("user_email");
@@ -1511,14 +1495,14 @@ const signOut: actionFunctionType = (dispatch) => {
       // await AsyncStorage.setItem("next_billing_time", "null")
 
       try {
-      } catch (error) { }
+      } catch (error) {}
       // await AsyncStorage.setItem("schedule_subscription", "false")
 
       // await instance.post("/users/signout", { user_id })
 
       // dispatch({ type: "SIGN_OUT" });
       // navigation.navigate("Login");
-    } catch (error) { }
+    } catch (error) {}
   };
 };
 
@@ -1542,12 +1526,14 @@ const updateUserData: actionFunctionType = (dispatch) => {
       let webToken = window.localStorage.getItem("token");
 
       if (!webToken) {
-              dispatch({ type: "UPDATE_USER_DATA", payload: {} });
+        dispatch({ type: "UPDATE_USER_DATA", payload: {} });
 
-        return
+        return;
       }
-      
-      let res = await axios.post(process.env.apiUrl + "/api/get-single-user", {},
+
+      let res = await axios.post(
+        process.env.apiUrl + "/api/get-single-user",
+        {},
         // {
         //   timezone: DateTime.now().zoneName,
         //   OS:
@@ -1556,12 +1542,17 @@ const updateUserData: actionFunctionType = (dispatch) => {
         //       navigator?.userAgent?.indexOf(";")
         //     ) || "",
         // },
-        { headers: { Authorization: `Bearer ${webToken}` } }
+        { headers: { Authorization: `Bearer ${webToken}` } },
       );
-      dispatch({ type: "UPDATE_TOKEN", payload: { token: res?.data?.result?.token } });
+      dispatch({
+        type: "UPDATE_TOKEN",
+        payload: { token: res?.data?.result?.token },
+      });
       dispatch({ type: "UPDATE_USER_DATA", payload: res?.data?.result });
       dispatch({ type: "UPDATE_PROFILE", payload: res?.data?.userprofile });
-      let socket: Socket<any, any> = io(`${process.env.apiUrl}`, { path: "/api/tirupatitravels" });
+      let socket: Socket<any, any> = io(`${process.env.apiUrl}`, {
+        path: "/api/tirupatitravels",
+      });
 
       //   let subRes = await axios.post(process.env.apiUrl+"/api/single-user-subscription",{id:res.data.data._id})
       //   let subData = subRes.data.usersubscriptiondoc
@@ -1570,27 +1561,47 @@ const updateUserData: actionFunctionType = (dispatch) => {
       //   payload: res.data?.subscription,
       // });
       //     let socket:Socket<any,any> = io(`${process.env.apiUrl}`, {path:"/api/socketconnect"});
-      const updateNotificationData = async ({ user_id, page }: { user_id: any, page: any }) => {
+      const updateNotificationData = async ({
+        user_id,
+        page,
+      }: {
+        user_id: any;
+        page: any;
+      }) => {
         // const updateNotificationData = async({user_id, page, currentDate}:{user_id:any,page:any,currentDate:any})=>{
         // let user_id =res.data.data._id
         if (user_id) {
-          dispatch({ type: "CLEAR_NOTIFICATION", payload: {} })
-          let res = await axios.post(process.env.apiUrl + `/api/get-user-notification/1`, { user_id }, { withCredentials: true })
-          let notificationlist = res?.data?.userNotification
+          dispatch({ type: "CLEAR_NOTIFICATION", payload: {} });
+          let res = await axios.post(
+            process.env.apiUrl + `/api/get-user-notification/1`,
+            { user_id },
+            { withCredentials: true },
+          );
+          let notificationlist = res?.data?.userNotification;
           if (res?.data) {
             // setNotificationBadgeCount(res?.data?.nsCount)
 
-            dispatch({ type: "SET_NOTIFICATION_DATA", payload: notificationlist })
-            dispatch({ type: "SET_NOTIFICATION_COUNT", payload: res?.data?.notifCount })
-            dispatch({ type: "SET_NOTIFICATION_BADGE_COUNT", payload: res?.data?.nsCount })
-
+            dispatch({
+              type: "SET_NOTIFICATION_DATA",
+              payload: notificationlist,
+            });
+            dispatch({
+              type: "SET_NOTIFICATION_COUNT",
+              payload: res?.data?.notifCount,
+            });
+            dispatch({
+              type: "SET_NOTIFICATION_BADGE_COUNT",
+              payload: res?.data?.nsCount,
+            });
           }
-
         }
-      }
-      dispatch({ type: "SOCKET", payload: { socket, setNotificationData: updateNotificationData } })
+      };
+      dispatch({
+        type: "SOCKET",
+        payload: { socket, setNotificationData: updateNotificationData },
+      });
       // updateNotificationData({user_id:res?.data?.data?._id, page:1, currentDate:DateTime.now().toUTC().toISO()})
-      updateNotificationData({ user_id: res?.data?.data?._id, page: 1 })
+      updateNotificationData({ user_id: res?.data?.data?._id, page: 1 });
       // dispatch({ type: "SOCKET", payload: { socket, user_id: res?.data?.result?._id } })
 
       // if (onSignIn) {
@@ -1604,12 +1615,11 @@ const updateUserData: actionFunctionType = (dispatch) => {
       dispatch({ type: "SIGN_OUT", payload: {} });
 
       // if (AuthRoutes[pathName]) {
-        // router.push("/");
+      // router.push("/");
       // }
     }
   };
 };
-
 
 // const updateUserData: actionFunctionType = (dispatch) => {
 //   return async ({
@@ -1722,19 +1732,17 @@ const updateUserProfile: actionFunctionType = (dispatch) => {
     phone,
     address,
     setMessage,
-
   }) => {
     try {
       setLoading(true);
-      let web_token = localStorage.getItem("token")
+      let web_token = localStorage.getItem("token");
       let res = await axios.post(
         process.env.apiUrl + "/api/update-user-profile",
         { user_id, dob_zone, dob, name, gender, phone, address },
-        { headers: { Authorization: `Bearer ${web_token}` } }
+        { headers: { Authorization: `Bearer ${web_token}` } },
       );
 
-
-      toast.success("Profile updated successfully.")
+      toast.success("Profile updated successfully.");
       // const response = await  instance.put("/users/updateuser", { ...data, id, request_origin: "app" }, { headers: { Authorization: `Bearer ${token}` } })
 
       // if (photoData) {
@@ -1766,7 +1774,6 @@ const updateUserProfile: actionFunctionType = (dispatch) => {
       // }
 
       setLoading(false);
-
     } catch (err) {
       setLoading(false);
       setDisable(false);
@@ -1803,7 +1810,7 @@ const setLoadingStatus: actionFunctionType = (dispatch) => {
   return async ({ status }) => {
     try {
       // dispatch({ type: "LOADING_STATUS", payload: status })
-    } catch (error) { }
+    } catch (error) {}
   };
 };
 
@@ -1941,9 +1948,7 @@ const getChats: actionFunctionType = (dispatch) => {
 // }
 const setSocket: actionFunctionType = (dispatch) => {
   return async ({ user_id }) => {
-    let socket = io(process.env.apiUrl,
-      { path: "/api/tirupatitravels" }
-    );
+    let socket = io(process.env.apiUrl, { path: "/api/tirupatitravels" });
     dispatch({ type: "SOCKET", payload: { socket, user_id } });
   };
 };
@@ -1993,7 +1998,7 @@ const getUnseenMessages: actionFunctionType = (dispatch) => {
       // let token = await AsyncStorage.getItem("token")
       // let message_data = await instance.post("/users/messagenotseen", { user_id }, { headers: { Authorization: `Bearer ${token}` } })
       // dispatch({ type: "SET_NSEEN", payload: message_data.data.all_nseen })
-    } catch (error) { }
+    } catch (error) {}
   };
 };
 
@@ -2067,12 +2072,12 @@ const updateUserActivity: actionFunctionType = (dispatch) => {
       if (user_id) {
         let res = await axios.post(
           process.env.apiUrl + "/api/add-user-activity",
-          { user_id, action, actionUrl }
+          { user_id, action, actionUrl },
         );
       } else {
         let res = await axios.post(
           process.env.apiUrl + "/api/add-user-activity",
-          { action, actionUrl }
+          { action, actionUrl },
         );
       }
     } catch (error) {
@@ -2106,16 +2111,15 @@ const setNotificationData: actionFunctionType = (dispatch) => {
         // dispatch({ type: "CLEAR_NOTIFICATION", payload: {} });
         // dispatch({ type: "LOADING_NOTIF_DATA", payload: true });
         // }
-        let limit=10;
-        if(page == 1){
+        let limit = 10;
+        if (page == 1) {
           dispatch({ type: "CLEAR_NOTIFICATION", payload: {} });
-          
         }
-        
+
         let res = await axios.post(
           process.env.apiUrl + `/api/get-user-notification/${page}`,
           { user_id, limit },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         let notificationlist = res?.data?.userNotification;
         console.log(res?.data, "==notification data in context api==");
@@ -2205,7 +2209,7 @@ const setNotificationSeen: actionFunctionType = (dispatch) => {
         // console.log(notifyIds, "==updating seen=======================");
         let res = await axios.post(
           process.env.apiUrl + `/api/update-notification-seen`,
-          { user_id, notifyIds }
+          { user_id, notifyIds },
         );
         // setNotificationBadgeCount(notificationBadgeCount)
         let seenCount = notifyIds?.length;
@@ -2245,15 +2249,15 @@ const setUrlData: actionFunctionType = (dispatch) => {
 const getUserSubscriptionData: actionFunctionType = (dispatch) => {
   return async ({ user_id }) => {
     try {
-      const webToken = localStorage.getItem("token")
+      const webToken = localStorage.getItem("token");
       let res = await axios.post(
         process.env.apiUrl + "/api/get-single-subscription",
         { user_id },
-        { headers: { Authorization: `Bearer ${webToken}` } }
+        { headers: { Authorization: `Bearer ${webToken}` } },
       );
       let subData = res?.data?.subscription;
       dispatch({ type: "SET_USER_SUBSCRIPTION_DATA", payload: subData });
-    } catch (error) { }
+    } catch (error) {}
   };
 };
 const getUserData: actionFunctionType = (dispatch) => {
@@ -2266,15 +2270,15 @@ const getUserData: actionFunctionType = (dispatch) => {
       });
       dispatch({ type: "USER_DATA", payload: res.data?.result });
       dispatch({ type: "UPDATE_PROFILE", payload: res.data?.profile });
-    } catch (error) { }
+    } catch (error) {}
   };
 };
 
 const getNoticeCount: actionFunctionType = (dispatch) => {
   return async (count) => {
-    try {      
+    try {
       dispatch({ type: "NOTICE_COUNT", payload: count });
-    } catch (error) { }
+    } catch (error) {}
   };
 };
 
@@ -2335,15 +2339,15 @@ const { Context, Provider } = createDataContext(
       updated_at: "",
       updated_by: "",
       user_type_id: 0,
-      empNo:"",
+      empNo: "",
       roleId: {
         created_at: "",
         updated_at: "",
         _id: "",
         name: "",
-        permissions: []
+        permissions: [],
       },
-      token: ""
+      token: "",
     },
     userProfile: {
       dob: "",
@@ -2374,7 +2378,7 @@ const { Context, Provider } = createDataContext(
       updated_at: "",
       updated_by: "",
       userId: "",
-      zipCode: ""
+      zipCode: "",
     },
     getUserDetails: {},
     userToken: null,
@@ -2489,7 +2493,7 @@ const { Context, Provider } = createDataContext(
     loadingNotificationData: false,
     urlData: null,
     noticeCount: 0,
-  }
+  },
 );
 
 export { Provider, Context };

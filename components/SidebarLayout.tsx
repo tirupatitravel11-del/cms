@@ -2,7 +2,7 @@
 "use client";
 import { useContext, useEffect, useState } from "react";
 import Header from "@/components/Header";
-import CustomCursor from "@/components/CustomCursor";
+
 import { contextType } from "@/contextApi/CreateDataContext";
 import { Context } from "@/contextApi/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
