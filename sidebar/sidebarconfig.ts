@@ -74,6 +74,8 @@ export const sidebarConfig: SidebarItemType[] = [
   { label: "CabHub", path: "/cabhub", permission: "", icon: CarTaxiFront },
   { label: "HotelHub", path: "/hotelhub", permission: "", icon: Hotel },
   { label: "PackageHub", path: "/packagehub", permission: "", icon: Package },
+   { label: "Routes", path: "/routesnew", permission: "", icon: Road },
+
 
   {
     label: "Role & Permission",
