@@ -1551,7 +1551,7 @@ const updateUserData: actionFunctionType = (dispatch) => {
       dispatch({ type: "UPDATE_USER_DATA", payload: res?.data?.result });
       dispatch({ type: "UPDATE_PROFILE", payload: res?.data?.userprofile });
       let socket: Socket<any, any> = io(`${process.env.apiUrl}`, {
-        path: "/api/tirupatitravels",
+        path: "/api/tirupatitravel",
       });
 
       //   let subRes = await axios.post(process.env.apiUrl+"/api/single-user-subscription",{id:res.data.data._id})
