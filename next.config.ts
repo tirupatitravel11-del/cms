@@ -3,8 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode:false,
   env: {
-    // apiUrl: "http://localhost:8000"
-    apiUrl: "https://www.api.tirupatitravel.in/"
+    apiUrl: "http://localhost:8000"
+    // apiUrl: "https://api.tirupatitravel.in/"
  
 
   },
@@ -30,4 +30,3 @@ const nextConfig: NextConfig = {
 
 export default nextConfig;
 
-// dfefd?
