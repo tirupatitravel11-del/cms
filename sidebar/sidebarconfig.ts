@@ -41,6 +41,7 @@ export interface SidebarItemType {
   permission?: string | null;
   icon: React.ComponentType<any>;
   role?: ("admin" | "student" | "teacher" | "counselor")[];
+   hideForAdmin?: boolean;
   subMenu?: SidebarItemType[];
 }
 
@@ -106,5 +107,10 @@ export const sidebarConfig: SidebarItemType[] = [
         role: ["admin"],
       },
     ],
+  },
+  { label: "Blog", path: "/blog", permission: "blog", icon: Rss, role: ["admin"], hideForAdmin: false },
+
+{
+    label: "Cab Bookings", path: "/cabbooking", permission: "manage-leads", icon: Settings, role: ["admin"], hideForAdmin: false
   },
 ];
