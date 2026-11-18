@@ -81,17 +81,7 @@ const LoginComponent: React.FC<LoginComponentProps> = ({ onLoginSuccess }) => {
       return;
     }
 
-    signIn({email, password, setLoading, setError:setErrors, router, selectedrole:selectedRole})
-
-    
-
-    // Simulate API call
-    // setTimeout(() => {
-    setLoading(false);
-    // router.push("/dashboard")
-    // Simulate successful login
-    //   onLoginSuccess?.();
-    // }, 1500);
+    await signIn({ email, password, setLoading, router, selectedrole: selectedRole });
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {

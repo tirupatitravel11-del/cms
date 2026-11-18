@@ -966,15 +966,12 @@ const signIn: actionFunctionType = (dispatch) => {
     email,
     password,
     setLoading,
-    setError,
     router,
     // selectedrole,
   }) => {
     try {
-      // dispatch({ type: "LOADING_CONTENT", payload: true });
       setLoading(true);
 
-      // Step 1: Sign In
       const response = await axios.post(
         `${process.env.apiUrl}/api/admin-login`,
         {
@@ -990,64 +987,52 @@ const signIn: actionFunctionType = (dispatch) => {
         },
       );
 
-      // console.log(response, "siginresponse")
       const token = response?.data?.token;
-      const userId = response.data.userData?._id;
-      toast.success(response?.data?.message);
+      const userData = response?.data?.userData;
+      const userId = userData?._id;
 
-      try {
-        localStorage.setItem("token", token);
-      } catch (error) {}
+      if (!token || !userId) {
+        throw new Error("Login response is missing the required user information.");
+      }
 
-      // Step 2: Fetch Subscription Data
-      // const subRes = await axios.post(
-      //   `${process.env.apiUrl}/api/get-single-subscription`,
-      //   { user_id: userId },
-      //   { headers: { Authorization: `Bearer ${token}` } }
-      // );
-      // const subData = subRes.data.subscription;
+      localStorage.setItem("token", token);
+      dispatch({ type: "UPDATE_TOKEN", payload: { token } });
+      dispatch({ type: "USER_DATA", payload: userData });
+      toast.success(response?.data?.message || "Login successful.");
+      router.replace("/dashboard");
 
-      // Step 3: Fetch User Profile
-      // const timezone = DateTime.now().zoneName;
-      const profileRes = await axios.post(
+      void axios.post(
         `${process.env.apiUrl}/api/get-single-user`,
         {
           id: userId,
         },
         { headers: { Authorization: `Bearer ${token}` } },
-      );
-      // console.log(profileRes, "profile")
-      const profile = profileRes.data?.userprofile;
+      )
+        .then((profileRes) => {
+          dispatch({
+            type: "UPDATE_PROFILE",
+            payload: profileRes.data?.userprofile,
+          });
+        })
+        .catch((error: unknown) => {
+          const message = axios.isAxiosError(error)
+            ? error.response?.data?.message
+            : undefined;
+          toast.error(
+            message || "Login succeeded, but the user profile could not be loaded.",
+          );
+        });
+    } catch (error: unknown) {
+      const message = axios.isAxiosError(error)
+        ? error.response?.data?.message || error.message
+        : error instanceof Error
+          ? error.message
+          : "Login failed. Please try again.";
 
-      // Step 4: Dispatch All Together
-      dispatch({ type: "UPDATE_TOKEN", payload: { token } });
-      dispatch({ type: "USER_DATA", payload: response?.data?.userData });
-      // dispatch({ type: "SET_USER_SUBSCRIPTION_DATA", payload: subData });
-      dispatch({ type: "UPDATE_PROFILE", payload: profile });
-
-      // Step 5: Navigate
-      const returnUrl = localStorage.getItem("returnUrl");
-      if (returnUrl) {
-        router.push(returnUrl);
-        localStorage.removeItem("returnUrl");
-      } else {
-        router.push("/dashboard");
-      }
-
-      // setLoading(false);
-      // dispatch({ type: "LOADING_CONTENT", payload: false });
-    } catch (err: any) {
+      toast.error(message);
+    } finally {
       setLoading(false);
       dispatch({ type: "LOADING_CONTENT", payload: false });
-
-      if (err?.response?.data?.message) {
-        setError(err.response.data.message);
-        toast.error(err.response.data.message);
-      }
-
-      // if (err?.response?.data?.needVerification) {
-      //   setNeedEmailVerification(true);
-      // }
     }
   };
 };

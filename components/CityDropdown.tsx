@@ -53,22 +53,25 @@ console.log("sdf")
       }
       onInputChange={(e, value) => setSearch(value)}
       onChange={(e, value) => onChange(value)}
-   renderInput={(params:any) => (
-  <TextField
-    {...params}
-    label="Select City"
-    placeholder="Search City"
-    InputProps={{
-      ...params.InputProps,
-      endAdornment: (
-        <>
-          {loading ? <CircularProgress size={20} /> : null}
-          {params.InputProps?.endAdornment}
-        </>
-      ),
-    }}
-  />
-)}
+      renderInput={(params) => (
+        <TextField
+          {...params}
+          label="Select City"
+          placeholder="Search City"
+          slotProps={{
+            ...params.slotProps,
+            input: {
+              ...params.slotProps.input,
+              endAdornment: (
+                <>
+                  {loading ? <CircularProgress size={20} /> : null}
+                  {params.slotProps.input.endAdornment}
+                </>
+              ),
+            },
+          }}
+        />
+      )}
     />
   );
 }
