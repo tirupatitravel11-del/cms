@@ -563,7 +563,7 @@ const AuthReducer: authReducerType = (
   } else if (action.type == "CLEAR_SOCKET") {
     return {
       ...state,
-      socket: null,
+      socket: null, 
     };
   } else if (action.type == "SET_TOTAL_CHATS") {
     return {
@@ -996,6 +996,9 @@ const signIn: actionFunctionType = (dispatch) => {
       }
 
       localStorage.setItem("token", token);
+      // Set cookie on CRM domain so Next.js middleware allows /dashboard in production
+      document.cookie = `auth_token=${token}; path=/; max-age=${24 * 60 * 60}; SameSite=Lax; Secure`;
+
       dispatch({ type: "UPDATE_TOKEN", payload: { token } });
       dispatch({ type: "USER_DATA", payload: userData });
       toast.success(response?.data?.message || "Login successful.");
@@ -1419,75 +1422,33 @@ const fetchUpdatedProfileData: actionFunctionType = (dispatch) => {
 };
 
 const signOut: actionFunctionType = (dispatch) => {
-  return async ({
-    // navigation,
-    user_id,
-    // socket,
-    // mode,
-    router,
-    // signup_method,
-    // updateUserActivity,
-    pathName,
-    token,
-  }) => {
+  return async ({ user_id, router, token }) => {
     try {
-      const BG_TASK = "BACKGROUND-NOTIFICATION-TASK";
-      // await AsyncStorage.setItem("isLoggedIn", "false");
-      // const token = await AsyncStorage.getItem("token");
-      let res = await axios.post(
-        process.env.apiUrl + "/api/signout",
+      await axios.post(
+        `${process.env.apiUrl}/api/signout`,
         { userId: user_id },
-        { headers: { Authorization: `Bearer ${token}` } },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        },
       );
-
+    } catch (error) {
+      console.error("Signout API error:", error);
+    } finally {
       try {
-        window.localStorage.setItem("token", "");
+        window.localStorage.removeItem("token");
+        window.localStorage.removeItem("userData");
       } catch (error) {}
+
+      // Delete the CRM cookie so middleware blocks /dashboard after logout
+      document.cookie =
+        "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax; Secure";
+
       dispatch({ type: "UPDATE_TOKEN", payload: { token: "" } });
-      // try {
-      //   updateUserActivity({
-      //     user_id: res?.data?.userData?._id,
-      //     action: "Signout successful",
-      //     actionUrl: "/Signout",
-      //   });
-      // } catch (error) {
-      //   console.log(error, "");
-      // }
       dispatch({ type: "CLEAR_SOCKET", payload: {} });
       dispatch({ type: "SIGN_OUT", payload: {} });
-      router.push("/");
-      // if (signup_method == 58) {
-      //   // googleLogout()
-      // }
-
-      // if (signup_method == 59) {
-      // window.fbAsyncInit()
-      // window.FB.logout((res:any)=>{
-      //   console.log("facebook logout success");
-      // })
-      // }
-
-      // await AsyncStorage.setItem("user_id", "");
-      // await AsyncStorage.removeItem("user_email");
-      // await AsyncStorage.removeItem("user_firstname");
-      // await AsyncStorage.removeItem("user_lastname");
-      // await AsyncStorage.removeItem("user_mappin");
-      // await AsyncStorage.setItem("token","");
-      // await AsyncStorage.removeItem("user_photo");
-      // await AsyncStorage.removeItem("user_type_id");
-      // await AsyncStorage.setItem("isSubscribed", "null")
-      // await AsyncStorage.setItem("isTrial", "null")
-      // await AsyncStorage.setItem("next_billing_time", "null")
-
-      try {
-      } catch (error) {}
-      // await AsyncStorage.setItem("schedule_subscription", "false")
-
-      // await instance.post("/users/signout", { user_id })
-
-      // dispatch({ type: "SIGN_OUT" });
-      // navigation.navigate("Login");
-    } catch (error) {}
+      router.replace("/");
+    }
   };
 };
 
