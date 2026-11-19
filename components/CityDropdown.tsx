@@ -26,13 +26,13 @@ export default function CityDropdown({
     try {
       setLoading(true);
 
+      const baseUrl = process.env.apiUrl || "http://localhost:8000";
       const res = await axios.post(
-        `${process.env.apiUrl}/api/dropdown-cabhub-city`,
+        `${baseUrl}/api/dropdown-cabhub-city`,
         {
-search:keyword
+          search: keyword,
         }
       );
-console.log("sdf")
       setOptions(res.data.data || []);
     } catch (error) {
       console.log(error);
@@ -44,15 +44,26 @@ console.log("sdf")
   return (
     <Autocomplete
       options={options}
-      value={value}
+      value={value || null}
       loading={loading}
       freeSolo={false}
-      getOptionLabel={(option: any) => option.cityName || ""}
-      isOptionEqualToValue={(option: any, value: any) =>
-        option._id === value._id
-      }
-      onInputChange={(e, value) => setSearch(value)}
-      onChange={(e, value) => onChange(value)}
+      getOptionLabel={(option: any) => {
+        if (!option) return "";
+        if (typeof option === "string") return option;
+        return option.cityName || "";
+      }}
+      isOptionEqualToValue={(option: any, val: any) => {
+        if (!option || !val) return false;
+        return option._id === val._id;
+      }}
+      onInputChange={(e, newInputValue, reason) => {
+        if (reason === "input") {
+          setSearch(newInputValue);
+        } else if (reason === "clear") {
+          setSearch("");
+        }
+      }}
+      onChange={(e, selectedOption) => onChange(selectedOption)}
       renderInput={(params) => (
         <TextField
           {...params}
