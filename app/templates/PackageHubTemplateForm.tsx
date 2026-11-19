@@ -111,8 +111,8 @@ export default function AddPackage() {
 
     setFormData((prev) => ({
       ...prev,
-      city: selectedCity.cityName,
-      cab_page_id: selectedCity._id,
+      city: selectedCity?.cityName || "",
+      cab_page_id: selectedCity?._id || "",
     }));
   };
 
@@ -497,11 +497,19 @@ const handleSubmit = async (e: React.FormEvent) => {
       payload,
     );
 
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("token")
+        : null;
+
     const response = await axios.post(
       `${process.env.apiUrl}/api/create-update-package`,
       payload,
       {
         withCredentials: true,
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
       },
     );
 console.log(formData,"e")
@@ -587,7 +595,7 @@ console.log(formData,"e")
     <div className="rounded-xl bg-white p-6 shadow text-black">
       <h2 className="mb-6 text-2xl font-bold">Add Package</h2>
 
-      <form>
+      <form onSubmit={handleSubmit}>
         <CityDropdown value={city} onChange={handleCityChange} />
 
         <div className="mt-5 grid grid-cols-2 gap-5">
@@ -1033,7 +1041,6 @@ console.log(formData,"e")
             disabled={loading}
             type="submit"
             className="rounded-lg bg-blue-600 px-8 py-3 text-white"
-            onClick={handleSubmit}
           >
             {loading ? "Saving..." : "Save Package"}
           </button>
