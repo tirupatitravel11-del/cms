@@ -8,9 +8,9 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const session = req.cookies.get("connect.sid");
+  const session = req.cookies.get("auth_token");
 
-  if (pathname === "/") {
+  if (pathname === "/") { 
     if (session) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
